@@ -14,6 +14,7 @@ public class TransformerChain {
     public TransformerChain() {
         this.transformList = new ArrayList<>();
         transformList.add(new TomcatTransformer());
+        transformList.add(new RestTemplateTransformer());
     }
 
     public void doTransformChain(AgentBuilder.Default agentBuilder, Instrumentation inst) {
