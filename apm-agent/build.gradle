@@ -1,0 +1,38 @@
+group 'com.capstone.apm.agent'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
+    }
+}
+
+jar {
+    finalizedBy shadowJar
+    manifest {
+        attributes 'Premain-Class': 'com.capstone.apm.agent.Agent',
+                'Can-Redefine-Classes' : true,
+                'Can-Retransform-Classes' : true
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":apm-commons")
+    implementation group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+    implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.10.18'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
+}
