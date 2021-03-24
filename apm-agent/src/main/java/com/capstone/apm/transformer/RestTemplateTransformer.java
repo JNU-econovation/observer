@@ -4,14 +4,19 @@ import com.capstone.apm.transformer.interceptor.Interceptor;
 import net.bytebuddy.asm.Advice;
 
 public class RestTemplateTransformer extends AbstractTransformer{
+
+    private final String EXPECTED_CLASS_NAME = "org.springframework.http.client.AbstractClientHttpRequest";
+
+    private final String EXPECTED_METHOD_NAME = "execute";
+
     @Override
     protected String getExpectedMethodName() {
-        return "execute";
+        return EXPECTED_METHOD_NAME;
     }
 
     @Override
     protected String getExpectedClassName() {
-        return "org.springframework.http.client.AbstractClientHttpRequest";
+        return EXPECTED_CLASS_NAME;
     }
 
     @Override

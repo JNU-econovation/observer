@@ -4,17 +4,14 @@ import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder.Identified.Extendable;
 
 import java.lang.instrument.Instrumentation;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TransformerChain {
 
     private List<Transformer> transformList;
 
-    public TransformerChain() {
-        this.transformList = new ArrayList<>();
-        transformList.add(new TomcatTransformer());
-        transformList.add(new RestTemplateTransformer());
+    public TransformerChain(TransformerFactory transformerFactory) {
+        this.transformList = transformerFactory.getTransformers();
     }
 
     public void doTransformChain(AgentBuilder.Default agentBuilder, Instrumentation inst) {
