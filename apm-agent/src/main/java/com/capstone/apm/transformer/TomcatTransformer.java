@@ -1,10 +1,13 @@
 package com.capstone.apm.transformer;
 
+import com.capstone.apm.transaction.Transaction;
+import com.capstone.apm.transaction.TransactionContext;
 import com.capstone.apm.transformer.interceptor.Interceptor;
 import net.bytebuddy.asm.Advice;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.TimeUnit;
+
+import static com.capstone.apm.transaction.TransactionContext.getTransactionContext;
 
 public class TomcatTransformer extends AbstractTransformer{
 
@@ -28,20 +31,22 @@ public class TomcatTransformer extends AbstractTransformer{
 
     static class TomcatInterceptor implements Interceptor {
         @Advice.OnMethodEnter
-        public static long enter(@Advice.AllArguments Object[] args) {
-            long enterTime = System.nanoTime();
-            HttpServletRequest request = (HttpServletRequest) args[0];
-            System.out.println("Request URL : " + request.getRequestURL());
-            System.out.println("Client Addr : " + request.getRemoteAddr());
-            System.out.println("Thread Id : " + Thread.currentThread().getId());
-            return enterTime;
+        public static void enter(@Advice.AllArguments Object[] args) {
+            HttpServletRequest servletRequest = (HttpServletRequest)args[0];
+            String traceId = servletRequest.getHeader("Trace-Id");
+
+            TransactionContext context = getTransactionContext();
+            if(traceId != null)
+                context.startTransaction(traceId);
+            else
+                context.startTransaction();
+            context.saveRequest(servletRequest);
         }
 
         @Advice.OnMethodExit
-        public static void exit(@Advice.Enter long enterTime) {
-            long exitTime = System.nanoTime();
-            long executionTime = TimeUnit.MILLISECONDS.convert(exitTime - enterTime, TimeUnit.NANOSECONDS);
-            System.out.println("Method Execution Time " + executionTime + " milliseconds");
+        public static void exit() {
+            System.out.println(getTransactionContext().getTransactionAsString());
+            getTransactionContext().endTransaction();
         }
     }
 }
