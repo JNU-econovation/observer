@@ -1,50 +1,40 @@
 package com.capstone.apm.transaction;
 
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
-import static java.util.Objects.requireNonNull;
+public class TransactionContext implements TransactionLifeCycle {
 
-public class TransactionContext {
-
-    private final ThreadLocal<Transaction> transactions;
     private static final TransactionContext transactionContext = new TransactionContext();
 
+    private final TransactionRepository transactionRepository;
+    private final TransactionLifeCycle transactionLifeCycle;
+
     private TransactionContext() {
-        this.transactions = new ThreadLocal<>();
+        /*
+        * Dependency 생성 나중에 리팩터링하기
+         */
+        transactionRepository = new TransactionRepository();
+        transactionLifeCycle = new DefaultTransactionLifeCycle(transactionRepository);
     }
 
     public static TransactionContext getTransactionContext() {
         return transactionContext;
     }
 
-    public void startTransaction() {
-        Transaction transaction = new Transaction();
-        transactions.set(transaction);
+    @Override
+    public void startTransaction(ServletRequest servletRequest) {
+        transactionLifeCycle.startTransaction(servletRequest);
     }
 
-    public void startTransaction(String traceId) {
-        Transaction transaction = new Transaction(requireNonNull(traceId));
-        transactions.set(transaction);
+    @Override
+    public void endTransaction(ServletResponse servletResponse) {
+        transactionLifeCycle.endTransaction(servletResponse);
     }
 
-    public void endTransaction() {
-        Transaction transaction = getTransaction();
-        if(transaction != null) {
-            transaction.endTransaction();
-            this.transactions.remove();
-        }
-    }
-
-    private Transaction getTransaction() {
-        return transactions.get();
-    }
-
-    public void saveRequest(HttpServletRequest servletRequest) {
-        getTransaction().saveRequest(servletRequest);
-    }
 
     public String getTransactionAsString() {
-        return getTransaction().toString();
+        return transactionRepository.getTransactionAsString();
     }
 }

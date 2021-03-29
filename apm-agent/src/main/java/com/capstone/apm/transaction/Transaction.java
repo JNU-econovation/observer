@@ -3,11 +3,12 @@ package com.capstone.apm.transaction;
 import com.capstone.apm.commons.util.RandomUtil;
 import com.capstone.apm.commons.util.TimeUtil;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-public class Transaction {
+class Transaction {
     private long startTransactionTime;
     private long endTransactionTime;
     private long threadId;
@@ -27,10 +28,6 @@ public class Transaction {
         this.traceId = traceId;
     }
 
-    public void endTransaction() {
-        this.endTransactionTime = System.nanoTime();
-    }
-
     public long getTransactionExecuteTime() {
         return TimeUtil.convertNanoToMilli(endTransactionTime - startTransactionTime);
     }
@@ -47,8 +44,30 @@ public class Transaction {
                 '}';
     }
 
-    public void saveRequest(HttpServletRequest servletRequest) {
+    public void start(ServletRequest servletRequest) {
         this.clientAddr = servletRequest.getRemoteAddr();
-        this.requestUri = servletRequest.getRequestURI();
+
+        if(servletRequest instanceof HttpServletRequest) {
+            HttpServletRequest httpServletRequest = (HttpServletRequest)servletRequest;
+            String traceId = getOrCreateTraceId(httpServletRequest);
+
+            this.requestUri = httpServletRequest.getRequestURI();
+            this.traceId = traceId;
+        }
+    }
+
+    public void end(ServletResponse servletResponse){
+        this.endTransactionTime = System.nanoTime();
+        if(servletResponse instanceof HttpServletResponse){
+            HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        }
+    }
+
+    private String getOrCreateTraceId(HttpServletRequest servletRequest){
+        String header = servletRequest.getHeader("Trace-Id");
+        if(header == null)
+            header = RandomUtil.getRandomTraceId();
+        return header;
     }
 }

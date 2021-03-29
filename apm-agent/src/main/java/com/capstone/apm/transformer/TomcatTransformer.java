@@ -1,10 +1,11 @@
 package com.capstone.apm.transformer;
 
-import com.capstone.apm.transaction.Transaction;
 import com.capstone.apm.transaction.TransactionContext;
 import com.capstone.apm.transformer.interceptor.Interceptor;
 import net.bytebuddy.asm.Advice;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.capstone.apm.transaction.TransactionContext.getTransactionContext;
@@ -32,21 +33,16 @@ public class TomcatTransformer extends AbstractTransformer{
     static class TomcatInterceptor implements Interceptor {
         @Advice.OnMethodEnter
         public static void enter(@Advice.AllArguments Object[] args) {
-            HttpServletRequest servletRequest = (HttpServletRequest)args[0];
-            String traceId = servletRequest.getHeader("Trace-Id");
-
+            ServletRequest servletRequest = (ServletRequest)args[0];
             TransactionContext context = getTransactionContext();
-            if(traceId != null)
-                context.startTransaction(traceId);
-            else
-                context.startTransaction();
-            context.saveRequest(servletRequest);
+            context.startTransaction(servletRequest);
         }
 
         @Advice.OnMethodExit
-        public static void exit() {
+        public static void exit(@Advice.AllArguments Object[] args) {
+            ServletResponse response = (ServletResponse)args[1];
             System.out.println(getTransactionContext().getTransactionAsString());
-            getTransactionContext().endTransaction();
+            getTransactionContext().endTransaction(response);
         }
     }
 }
