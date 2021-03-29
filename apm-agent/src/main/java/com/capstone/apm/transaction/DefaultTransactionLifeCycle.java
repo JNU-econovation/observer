@@ -3,7 +3,10 @@ package com.capstone.apm.transaction;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-class DefaultTransactionLifeCycle implements TransactionLifeCycle{
+/*
+* TransactionLifeCycle 의 구현체
+ */
+class DefaultTransactionLifeCycle implements TransactionLifeCycle {
 
     private final TransactionRepository transactionRepository;
 

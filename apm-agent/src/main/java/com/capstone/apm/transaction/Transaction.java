@@ -8,6 +8,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/*
+* 트랜잭션 도중 서버에서 수집해야할 데이터
+ */
 class Transaction {
     private long startTransactionTime;
     private long endTransactionTime;
@@ -22,14 +25,12 @@ class Transaction {
         this.traceId = RandomUtil.getRandomTraceId();
     }
 
-    Transaction(String traceId) {
-        this.startTransactionTime = System.nanoTime();
-        this.threadId = Thread.currentThread().getId();
-        this.traceId = traceId;
-    }
-
     public long getTransactionExecuteTime() {
         return TimeUtil.convertNanoToMilli(endTransactionTime - startTransactionTime);
+    }
+
+    public String getTraceId() {
+        return traceId;
     }
 
     @Override
@@ -60,7 +61,6 @@ class Transaction {
         this.endTransactionTime = System.nanoTime();
         if(servletResponse instanceof HttpServletResponse){
             HttpServletResponse response = (HttpServletResponse) servletResponse;
-
         }
     }
 

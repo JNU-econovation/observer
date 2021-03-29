@@ -1,7 +1,11 @@
 package com.capstone.apm.transformer;
 
+import com.capstone.apm.transaction.TransactionContext;
 import com.capstone.apm.transformer.interceptor.Interceptor;
 import net.bytebuddy.asm.Advice;
+
+import java.util.List;
+import java.util.Map;
 
 public class RestTemplateTransformer extends AbstractTransformer{
 
@@ -27,8 +31,8 @@ public class RestTemplateTransformer extends AbstractTransformer{
 
     static class RestTemplateInterceptor implements Interceptor {
         @Advice.OnMethodEnter
-        private static void enter() {
-            System.out.println("RestTemplate Request Start");
+        private static void enter(@Advice.FieldValue("headers") Map<String, List<String>> headers) {
+            TransactionContext.getTransactionContext().modifyHeader(headers);
         }
 
         @Advice.OnMethodExit

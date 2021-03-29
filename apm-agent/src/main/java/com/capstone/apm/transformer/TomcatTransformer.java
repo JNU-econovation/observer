@@ -6,7 +6,6 @@ import net.bytebuddy.asm.Advice;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
 import static com.capstone.apm.transaction.TransactionContext.getTransactionContext;
 
