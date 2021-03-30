@@ -35,7 +35,7 @@ public class RestTemplateTransformer extends AbstractTransformer{
 
         @Advice.OnMethodEnter
         private static void enter(@Advice.FieldValue(HEADERS_FIELD_VALUE) Map<String, List<String>> headers) {
-            TransactionContext.getTransactionContext().injectTraceId(headers);
+            TransactionContext.getTransactionContext().propagate(headers);
         }
 
         @Advice.OnMethodExit

@@ -9,6 +9,7 @@ import net.bytebuddy.asm.Advice;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static com.capstone.apm.transaction.TransactionContext.getTransactionContext;
 
@@ -44,8 +45,8 @@ public class TomcatTransformer extends AbstractTransformer{
         @Advice.OnMethodExit
         public static void exit(@Advice.AllArguments Object[] args) {
             ServletResponse response = (ServletResponse)args[1];
-            System.out.println(getTransactionContext().getTransactionAsString());
-            getTransactionContext().endTransaction(new TransactionResponse());
+            getTransactionContext().endTransaction(TransactionResponse
+                    .ofServletResponse((HttpServletResponse)response));
         }
     }
 }

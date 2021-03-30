@@ -17,9 +17,10 @@ class DefaultTransactionPropagation implements TransactionPropagation{
     }
 
     @Override
-    public void injectTraceId(Map<String, List<String>> headers) {
+    public void propagate(Map<String, List<String>> headers) {
         String traceId = requireNonNull(transactionRepository.getTransactionTraceId());
-        System.out.println("Inject Trace Id : " + traceId);
+        int sequence = transactionRepository.getTransactionSequence();
         headers.put("trace-id", List.of(traceId));
+        headers.put("sequence", List.of(String.valueOf(sequence)));
     }
 }

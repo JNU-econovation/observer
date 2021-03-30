@@ -19,8 +19,8 @@ class DefaultTransactionLifeCycle implements TransactionLifeCycle {
     @Override
     public void startTransaction(Request request) {
         Transaction transaction = new Transaction();
-        transactionRepository.addTransaction(transaction);
         transaction.start(request);
+        transactionRepository.addTransaction(transaction);
     }
 
     @Override
@@ -28,5 +28,10 @@ class DefaultTransactionLifeCycle implements TransactionLifeCycle {
         Transaction transaction = requireNonNull(transactionRepository.getTransaction());
         transaction.end(response);
         transactionRepository.removeTransaction();
+
+        /*
+        * Logging Transaction Info
+         */
+        System.out.println(transaction);
     }
 }

@@ -40,10 +40,6 @@ public class TransactionRequest implements Request {
             headers.put(headerName, headerValue.nextElement());
          }
 
-         headers.forEach((key, value) -> {
-             System.out.println("Key : " + key + ", Value : " + value);
-         });
-
          transactionRequest.headers = headers;
          transactionRequest.requestUri = request.getRequestURI();
          transactionRequest.remoteAddr = request.getRemoteAddr();

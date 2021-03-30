@@ -44,8 +44,8 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
     }
 
     @Override
-    public void injectTraceId(Map<String, List<String>> headers) {
-        transactionPropagation.injectTraceId(headers);
+    public void propagate(Map<String, List<String>> headers) {
+        transactionPropagation.propagate(headers);
     }
 
     public String getTransactionAsString() {
