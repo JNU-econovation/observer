@@ -8,5 +8,5 @@ import java.util.Map;
 * 관련된 메서드를 제공하는 Interface
  */
 interface TransactionPropagation {
-    void modifyHeader(Map<String, List<String>> headers);
+    void injectTraceId(Map<String, List<String>> headers);
 }

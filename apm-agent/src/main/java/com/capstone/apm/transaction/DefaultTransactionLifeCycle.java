@@ -1,7 +1,9 @@
 package com.capstone.apm.transaction;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import com.capstone.apm.transaction.request.Request;
+import com.capstone.apm.transaction.response.Response;
+
+import static java.util.Objects.requireNonNull;
 
 /*
 * TransactionLifeCycle 의 구현체
@@ -15,18 +17,16 @@ class DefaultTransactionLifeCycle implements TransactionLifeCycle {
     }
 
     @Override
-    public void startTransaction(ServletRequest servletRequest) {
+    public void startTransaction(Request request) {
         Transaction transaction = new Transaction();
         transactionRepository.addTransaction(transaction);
-        transaction.start(servletRequest);
+        transaction.start(request);
     }
 
     @Override
-    public void endTransaction(ServletResponse servletResponse) {
-        Transaction transaction = transactionRepository.getTransaction();
-        if(transaction != null) {
-            transaction.end(servletResponse);
-            transactionRepository.removeTransaction();
-        }
+    public void endTransaction(Response response) {
+        Transaction transaction = requireNonNull(transactionRepository.getTransaction());
+        transaction.end(response);
+        transactionRepository.removeTransaction();
     }
 }

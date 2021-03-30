@@ -30,9 +30,12 @@ public class RestTemplateTransformer extends AbstractTransformer{
 
 
     static class RestTemplateInterceptor implements Interceptor {
+
+        private static final String HEADERS_FIELD_VALUE = "headers";
+
         @Advice.OnMethodEnter
-        private static void enter(@Advice.FieldValue("headers") Map<String, List<String>> headers) {
-            TransactionContext.getTransactionContext().modifyHeader(headers);
+        private static void enter(@Advice.FieldValue(HEADERS_FIELD_VALUE) Map<String, List<String>> headers) {
+            TransactionContext.getTransactionContext().injectTraceId(headers);
         }
 
         @Advice.OnMethodExit

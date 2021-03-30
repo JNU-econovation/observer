@@ -1,8 +1,9 @@
 package com.capstone.apm.transaction;
 
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import com.capstone.apm.transaction.request.Request;
+import com.capstone.apm.transaction.response.Response;
+
 import java.util.List;
 import java.util.Map;
 
@@ -33,18 +34,18 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
     }
 
     @Override
-    public void startTransaction(ServletRequest servletRequest) {
-        transactionLifeCycle.startTransaction(servletRequest);
+    public void startTransaction(Request request) {
+        transactionLifeCycle.startTransaction(request);
     }
 
     @Override
-    public void endTransaction(ServletResponse servletResponse) {
-        transactionLifeCycle.endTransaction(servletResponse);
+    public void endTransaction(Response response) {
+        transactionLifeCycle.endTransaction(response);
     }
 
     @Override
-    public void modifyHeader(Map<String, List<String>> headers) {
-        transactionPropagation.modifyHeader(headers);
+    public void injectTraceId(Map<String, List<String>> headers) {
+        transactionPropagation.injectTraceId(headers);
     }
 
     public String getTransactionAsString() {
