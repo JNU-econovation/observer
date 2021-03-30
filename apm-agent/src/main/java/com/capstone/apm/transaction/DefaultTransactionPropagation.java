@@ -8,7 +8,7 @@ import static java.util.Objects.*;
 /*
 * TransactionPropagation 의 구현체
  */
-class DefaultTransactionPropagation implements TransactionPropagation{
+class DefaultTransactionPropagation implements TransactionPropagation {
 
     private final TransactionRepository transactionRepository;
 
@@ -19,8 +19,8 @@ class DefaultTransactionPropagation implements TransactionPropagation{
     @Override
     public void propagate(Map<String, List<String>> headers) {
         String traceId = requireNonNull(transactionRepository.getTransactionTraceId());
-        int sequence = transactionRepository.getTransactionSequence();
+        int nextSequence = transactionRepository.getTransactionSequence() + 1;
         headers.put("trace-id", List.of(traceId));
-        headers.put("sequence", List.of(String.valueOf(sequence)));
+        headers.put("sequence", List.of(String.valueOf(nextSequence)));
     }
 }

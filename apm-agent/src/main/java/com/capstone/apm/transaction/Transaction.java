@@ -22,7 +22,6 @@ class Transaction {
     private int statusCode;
     private int sequence;
 
-
     Transaction() { }
 
     public long getTransactionExecuteTime() {
@@ -70,9 +69,8 @@ class Transaction {
 
     private String getOrCreateTraceId(Request request){
         String traceId = request.getHeader("trace-id");
-        if(traceId == null) {
+        if(traceId == null)
             traceId = RandomUtil.getRandomTraceId();
-        }
         return traceId;
     }
 
@@ -80,7 +78,7 @@ class Transaction {
         String sequence = request.getHeader("sequence");
         int seq = 0;
         if(sequence != null)
-            seq = Integer.parseInt(sequence) + 1;
+            seq = Integer.parseInt(sequence);
         return seq;
     }
 
