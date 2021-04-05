@@ -28,14 +28,6 @@ class Transaction {
         return TimeUtil.convertNanoToMilli(endTransactionTime - startTransactionTime);
     }
 
-    public String getTraceId() {
-        return traceId;
-    }
-
-    public int getSequence() {
-        return sequence;
-    }
-
     @Override
     public String toString() {
         return "Transaction{" +
@@ -98,4 +90,31 @@ class Transaction {
                     '}';
         }
     }
+
+    public String getTraceId() {
+        return traceId;
+    }
+    public int getSequence() {
+        return sequence;
+    }
+    public String getStatusAsString() {return transactionStatus.status; }
+    public int getStatusCode() {
+        return statusCode;
+    }
+    public long getEndTransactionTime() {
+        return endTransactionTime;
+    }
+    public long getStartTransactionTime() {
+        return startTransactionTime;
+    }
+    public long getThreadId() {
+        return threadId;
+    }
+    public String getClientAddr() {
+        return clientAddr;
+    }
+    public String getRequestUri() {
+        return requestUri;
+    }
+
 }
