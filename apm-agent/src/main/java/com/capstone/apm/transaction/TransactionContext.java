@@ -48,7 +48,8 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
 
     @Override
     public void propagate(Map<String, List<String>> headers) {
-        transactionPropagation.propagate(headers);
+        if(transactionRepository.hasTransaction())
+            transactionPropagation.propagate(headers);
     }
 
     public String getTransactionAsString() {

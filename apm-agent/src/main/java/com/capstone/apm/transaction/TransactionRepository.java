@@ -26,6 +26,10 @@ class TransactionRepository {
         }
     }
 
+    public boolean hasTransaction() {
+        return transactions.get() != null;
+    }
+
     public void removeTransaction() {
         transactions.remove();
     }
