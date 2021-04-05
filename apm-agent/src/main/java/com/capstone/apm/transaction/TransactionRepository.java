@@ -1,6 +1,8 @@
 package com.capstone.apm.transaction;
 
 
+import com.capstone.apm.transaction.exception.TransactionNotFoundException;
+
 import static java.util.Objects.*;
 
 /*
@@ -17,7 +19,11 @@ class TransactionRepository {
     public void addTransaction(Transaction transaction){ transactions.set(transaction); }
 
     public Transaction getTransaction(){
-        return transactions.get();
+        try {
+            return requireNonNull(transactions.get());
+        }catch (NullPointerException e){
+            throw new TransactionNotFoundException(e.getMessage());
+        }
     }
 
     public void removeTransaction() {
@@ -25,7 +31,7 @@ class TransactionRepository {
     }
 
     public String getTransactionAsString() {
-        return requireNonNull(getTransaction()).toString();
+        return getTransaction().toString();
     }
 
     public String getTransactionTraceId() {

@@ -25,7 +25,7 @@ class DefaultTransactionLifeCycle implements TransactionLifeCycle {
 
     @Override
     public void endTransaction(Response response) {
-        Transaction transaction = requireNonNull(transactionRepository.getTransaction());
+        Transaction transaction = transactionRepository.getTransaction();
         transaction.end(response);
         transactionRepository.removeTransaction();
 
