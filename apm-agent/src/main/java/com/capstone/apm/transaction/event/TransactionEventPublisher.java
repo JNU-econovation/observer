@@ -4,7 +4,8 @@ import com.capstone.apm.commons.event.EventConfiguration;
 import com.capstone.apm.commons.event.EventPublisher;
 
 public class TransactionEventPublisher extends EventPublisher<TransactionEvent> {
-    public TransactionEventPublisher(EventConfiguration eventConfiguration) {
-        super(eventConfiguration);
+
+    public TransactionEventPublisher() {
+        super();
     }
 }

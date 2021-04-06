@@ -4,11 +4,8 @@ package com.capstone.apm.commons.event;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 
-public class EventPublisher<T extends Event<?>> extends SubmissionPublisher<T> {
+import static java.util.concurrent.Flow.defaultBufferSize;
 
-    public EventPublisher(EventConfiguration eventConfiguration){
-        super(Executors.newFixedThreadPool(eventConfiguration.getThreadNum()),
-                eventConfiguration.getMaxEventBufferSize());
-    }
+public class EventPublisher<T extends Event<?>> extends SubmissionPublisher<T> {
 
 }
