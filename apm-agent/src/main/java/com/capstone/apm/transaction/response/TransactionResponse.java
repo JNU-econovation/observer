@@ -29,9 +29,12 @@ public class TransactionResponse implements Response {
 
 
         Collection<String> headerNames = response.getHeaderNames();
-        Map<String,String> headers =
-                headerNames.stream().collect(Collectors.toMap(headerName -> headerName, response::getHeader));
-
+        Map<String, String> headers =
+                headerNames.stream().collect(
+                        Collectors.toMap(
+                                headerName -> headerName,
+                                response::getHeader,
+                                (oldValue, newValue) -> String.join(",", oldValue, newValue)));
 
         transactionResponse.headers = headers;
         transactionResponse.statusCode = response.getStatus();

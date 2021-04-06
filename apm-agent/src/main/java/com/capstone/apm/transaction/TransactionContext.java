@@ -1,10 +1,12 @@
 package com.capstone.apm.transaction;
 
+import com.capstone.apm.commons.event.EventPublisher;
 import com.capstone.apm.transaction.event.TransactionEvent;
+import com.capstone.apm.transaction.event.TransactionEventPublisher;
+import com.capstone.apm.transaction.event.TransactionEventSubscriber;
 import com.capstone.apm.transaction.request.Request;
 import com.capstone.apm.transaction.response.Response;
-import com.capstone.apm.event.EventPublisher;
-import com.capstone.apm.event.EventConfiguration;
+import com.capstone.apm.commons.event.EventConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,7 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
     private final TransactionRepository transactionRepository;
     private final TransactionLifeCycle transactionLifeCycle;
     private final TransactionPropagation transactionPropagation;
-    private final EventPublisher eventPublisher;
+    private final TransactionEventPublisher eventPublisher;
 
     private TransactionContext() {
         /*
@@ -28,7 +30,10 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
          */
         this.transactionRepository = new TransactionRepository();
         this.transactionPropagation = new DefaultTransactionPropagation(transactionRepository);
-        this.eventPublisher = new EventPublisher(new EventConfiguration(5));
+
+        this.eventPublisher = new TransactionEventPublisher(new EventConfiguration(5, 10));
+        eventPublisher.subscribe(new TransactionEventSubscriber());
+
         this.transactionLifeCycle = new DefaultTransactionLifeCycle(transactionRepository, eventPublisher);
     }
 
