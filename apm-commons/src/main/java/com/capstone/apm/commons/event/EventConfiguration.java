@@ -2,13 +2,13 @@ package com.capstone.apm.commons.event;
 
 public class EventConfiguration {
 
-    private int threadNum;
+    private int eventRequestNumber;
 
-    public EventConfiguration(int threadNum){
-        this.threadNum = threadNum;
+    public EventConfiguration(int eventRequestNumber){
+        this.eventRequestNumber = eventRequestNumber;
     }
 
-    public int getThreadNum() {
-        return threadNum;
+    public int getEventRequestNumber() {
+        return eventRequestNumber;
     }
 }

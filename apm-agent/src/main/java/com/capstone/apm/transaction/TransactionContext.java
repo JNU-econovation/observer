@@ -7,6 +7,7 @@ import com.capstone.apm.transaction.event.TransactionEventSubscriber;
 import com.capstone.apm.transaction.request.Request;
 import com.capstone.apm.transaction.response.Response;
 import com.capstone.apm.commons.event.EventConfiguration;
+import com.capstone.apm.transaction.websocket.ServerConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,9 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
         this.transactionPropagation = new DefaultTransactionPropagation(transactionRepository);
 
         this.eventPublisher = new TransactionEventPublisher();
-        eventPublisher.subscribe(new TransactionEventSubscriber(new EventConfiguration(5)));
+        eventPublisher.subscribe(new TransactionEventSubscriber(
+                new ServerConfiguration("http://localhost:8082"),
+                new EventConfiguration(1), 5, 5));
 
         this.transactionLifeCycle = new DefaultTransactionLifeCycle(transactionRepository, eventPublisher);
     }

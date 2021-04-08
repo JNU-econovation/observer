@@ -27,7 +27,6 @@ public class TransactionResponse implements Response {
     public static TransactionResponse ofServletResponse(HttpServletResponse response){
         TransactionResponse transactionResponse = new TransactionResponse();
 
-
         Collection<String> headerNames = response.getHeaderNames();
         Map<String, String> headers =
                 headerNames.stream().collect(
