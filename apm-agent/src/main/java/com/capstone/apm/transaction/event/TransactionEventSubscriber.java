@@ -8,6 +8,7 @@ import com.capstone.apm.transaction.websocket.TransactionWebSocketClient;
 import com.capstone.apm.transaction.websocket.connection.TransactionWebSocketService;
 import org.java_websocket.client.WebSocketClient;
 
+import java.net.ConnectException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
@@ -41,10 +42,11 @@ public class TransactionEventSubscriber extends EventSubscriber<TransactionEvent
     @Override
     public void onNext(TransactionEvent item) {
         executorService.execute(() -> {
-            System.out.println("Thread ID : " + Thread.currentThread().getId() + " onNext Called");
             WebSocketClient client = webSocketService.getClient();
-            client.send(item.getContent().toString());
-            webSocketService.offerClient(client);
+            if(client != null) {
+                client.send(item.getContent().toString());
+                webSocketService.offerClient(client);
+            }
         });
         subscription.request(1);
     }

@@ -37,6 +37,7 @@ public class TransactionWebSocketClient extends WebSocketClient {
 
     @Override
     public void onError(Exception ex) {
-        ex.printStackTrace();
+        //TODO Server Connection Error 처리
+        System.out.println("Collector Server Error : " + ex.getMessage());
     }
 }
