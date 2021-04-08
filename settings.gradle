@@ -1,3 +1,4 @@
 rootProject.name = 'Capstone-APM'
 include 'apm-commons'
 include 'apm-agent'
+include 'apm-collector'
