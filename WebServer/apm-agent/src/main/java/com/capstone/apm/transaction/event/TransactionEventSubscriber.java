@@ -1,51 +1,35 @@
 package com.capstone.apm.transaction.event;
 
-import com.capstone.apm.commons.event.Event;
 import com.capstone.apm.commons.event.EventConfiguration;
 import com.capstone.apm.commons.event.EventSubscriber;
 import com.capstone.apm.transaction.websocket.ServerConfiguration;
-import com.capstone.apm.transaction.websocket.TransactionWebSocketClient;
-import com.capstone.apm.transaction.websocket.connection.TransactionWebSocketService;
-import org.java_websocket.client.WebSocketClient;
+import com.capstone.apm.transaction.websocket.connection.ServerConnectionFailedException;
 
-import java.net.ConnectException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Flow;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import static java.util.concurrent.Flow.*;
 
 
 public class TransactionEventSubscriber extends EventSubscriber<TransactionEvent> {
 
     private final ExecutorService executorService;
-    private final TransactionWebSocketService webSocketService;
-
-    private final int DEFAULT_CONNECTION_POOL_SIZE = 5;
+    private final TransactionEventHandler eventHandler;
 
     public TransactionEventSubscriber(ServerConfiguration serverConfiguration,
                                       EventConfiguration eventConfiguration,
-                                      int threadPoolSize, int connectionPoolSize) {
+                                      int threadPoolSize, int initialSocketSize) {
         super(eventConfiguration);
         this.executorService = Executors.newFixedThreadPool(threadPoolSize);
-        this.webSocketService = new TransactionWebSocketService(serverConfiguration, connectionPoolSize);
-    }
-
-    public TransactionEventSubscriber(ServerConfiguration serverConfiguration,
-                                      EventConfiguration eventConfiguration) {
-        super(eventConfiguration);
-        this.executorService = Executors.newCachedThreadPool();
-        this.webSocketService = new TransactionWebSocketService(serverConfiguration, DEFAULT_CONNECTION_POOL_SIZE);
+        this.eventHandler = new TransactionEventHandler(serverConfiguration, initialSocketSize);
     }
 
     @Override
-    public void onNext(TransactionEvent item) {
-        executorService.execute(() -> {
-            WebSocketClient client = webSocketService.getClient();
-            if(client != null) {
-                client.send(item.getContent().toString());
-                webSocketService.offerClient(client);
+    public void onNext(TransactionEvent event) {
+        executorService.execute(() ->{
+            try {
+                eventHandler.handleEvent(event);
+            }
+            catch (ServerConnectionFailedException e) {
+                System.err.println("Server Connection Failed. So Event is Ignored : " + e);
             }
         });
         subscription.request(1);

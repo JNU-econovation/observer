@@ -1,5 +1,6 @@
 package com.capstone.apm.transaction.websocket;
 
+import com.capstone.apm.transaction.websocket.connection.ServerConnectionFailedException;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -19,7 +20,6 @@ public class TransactionWebSocketClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handShakeData) {
-        //Collector Server Connected
         System.out.println("Collector Server Connected");
     }
 
@@ -31,13 +31,15 @@ public class TransactionWebSocketClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        //TODO Server Connection이 끊겼을때 처리
-        System.out.println("Server Connection Closed : " + reason);
+        try {
+            closeBlocking();
+        }catch (InterruptedException e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void onError(Exception ex) {
-        //TODO Server Connection Error 처리
-        System.out.println("Collector Server Error : " + ex.getMessage());
+        System.err.printf("Web Socket Error { Thread ID : %d }\n", Thread.currentThread().getId());
     }
 }
