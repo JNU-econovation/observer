@@ -27,23 +27,31 @@ public class WebSocketService {
 
     public WebSocketClient getClient() {
         WebSocketClient client = getOrCreateClient();
-        try {
-            if (!client.isOpen())
-                client.connectBlocking();
-            return client;
-        }catch (InterruptedException | IllegalStateException ex) {
-            ex.printStackTrace();
-            throw new ServerConnectionFailedException(ex.getMessage());
-        }
+        client = checkClientIsClosed(client);
+        checkClientIsConnected(client);
+        return client;
     }
 
     private WebSocketClient getOrCreateClient() {
-        WebSocketClient client;
         if(!clients.isEmpty())
-            client = clients.poll();
+            return clients.poll();
         else
-            client = makeClient();
+            return makeClient();
+    }
+
+    private WebSocketClient checkClientIsClosed(WebSocketClient client) {
+        if(client.isClosed())
+            return makeClient();
         return client;
+    }
+
+    private void checkClientIsConnected(WebSocketClient client) {
+        try {
+            if(!client.isOpen())
+                client.connectBlocking();
+        }catch (IllegalStateException | InterruptedException ex) {
+            throw new ServerConnectionFailedException(ex.getMessage());
+        }
     }
 
     public void offerClient(WebSocketClient client) {
@@ -58,8 +66,6 @@ public class WebSocketService {
     }
 
     private TransactionWebSocketClient makeClient() {
-        TransactionWebSocketClient client = TransactionWebSocketClient.create(configuration.getUri());
-        client.connect();
-        return client;
+        return TransactionWebSocketClient.create(configuration.getUri());
     }
 }

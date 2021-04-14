@@ -1,12 +1,9 @@
 package com.capstone.apm.transaction.websocket;
 
-import com.capstone.apm.transaction.websocket.connection.ServerConnectionFailedException;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.BlockingQueue;
 
 public class TransactionWebSocketClient extends WebSocketClient {
 
@@ -31,15 +28,12 @@ public class TransactionWebSocketClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        try {
-            closeBlocking();
-        }catch (InterruptedException e){
-            throw new RuntimeException(e);
-        }
+        System.out.println("Collector Server Closed");
+        close();
     }
 
     @Override
     public void onError(Exception ex) {
-        System.err.printf("Web Socket Error { Thread ID : %d }\n", Thread.currentThread().getId());
+        System.err.printf("Web Socket Error { Thread ID : %d } " + ex.getMessage() + " \n", Thread.currentThread().getId());
     }
 }

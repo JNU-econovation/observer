@@ -24,14 +24,7 @@ public class TransactionEventSubscriber extends EventSubscriber<TransactionEvent
 
     @Override
     public void onNext(TransactionEvent event) {
-        executorService.execute(() ->{
-            try {
-                eventHandler.handleEvent(event);
-            }
-            catch (ServerConnectionFailedException e) {
-                System.err.println("Server Connection Failed. So Event is Ignored : " + e);
-            }
-        });
+        eventHandler.handleEvent(event);
         subscription.request(1);
     }
 }
