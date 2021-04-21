@@ -35,7 +35,7 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
         this.eventPublisher = new TransactionEventPublisher();
         eventPublisher.subscribe(new TransactionEventSubscriber(
                 new ServerConfiguration("http://localhost:8082"),
-                new EventConfiguration(1), 5, 5));
+                new EventConfiguration(1)));
 
         this.transactionLifeCycle = new DefaultTransactionLifeCycle(transactionRepository, eventPublisher);
     }

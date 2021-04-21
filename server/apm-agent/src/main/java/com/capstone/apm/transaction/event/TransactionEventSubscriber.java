@@ -11,15 +11,12 @@ import java.util.concurrent.Executors;
 
 public class TransactionEventSubscriber extends EventSubscriber<TransactionEvent> {
 
-    private final ExecutorService executorService;
     private final TransactionEventHandler eventHandler;
 
     public TransactionEventSubscriber(ServerConfiguration serverConfiguration,
-                                      EventConfiguration eventConfiguration,
-                                      int threadPoolSize, int initialSocketSize) {
+                                      EventConfiguration eventConfiguration) {
         super(eventConfiguration);
-        this.executorService = Executors.newFixedThreadPool(threadPoolSize);
-        this.eventHandler = new TransactionEventHandler(serverConfiguration, initialSocketSize);
+        this.eventHandler = new TransactionEventHandler(serverConfiguration);
     }
 
     @Override

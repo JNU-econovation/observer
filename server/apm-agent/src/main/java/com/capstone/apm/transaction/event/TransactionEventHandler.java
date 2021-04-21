@@ -1,5 +1,7 @@
 package com.capstone.apm.transaction.event;
 
+import com.capstone.apm.collector.CollectorClient;
+import com.capstone.apm.collector.CollectorWebSocketFactory;
 import com.capstone.apm.transaction.websocket.ServerConfiguration;
 import com.capstone.apm.transaction.websocket.connection.ServerConnectionFailedException;
 import com.capstone.apm.transaction.websocket.connection.WebSocketService;
@@ -8,17 +10,15 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException;
 
 public class TransactionEventHandler {
 
-    private final WebSocketService webSocketService;
+    private final CollectorClient collectorClient;
 
-    public TransactionEventHandler(ServerConfiguration configuration, int initialSocketSize) {
-        this.webSocketService = new WebSocketService(configuration, initialSocketSize);
+    public TransactionEventHandler(ServerConfiguration configuration) {
+        this.collectorClient = new CollectorClient(configuration);
     }
 
-    public void handleEvent(TransactionEvent event) throws ServerConnectionFailedException {
+    public void handleEvent(TransactionEvent event){
         try {
-            WebSocketClient client = webSocketService.getClient();
-            client.send(event.getContent().toString());
-            webSocketService.offerClient(client);
+            collectorClient.sendMessage(event.getContent().toString());
         }catch (ServerConnectionFailedException | WebsocketNotConnectedException e){
             System.err.println("Server Connection Failed. So Event is Ignored : " + e);
         }

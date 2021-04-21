@@ -1,18 +1,18 @@
-package com.capstone.apm.transaction.websocket;
+package com.capstone.apm.collector;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 
-public class TransactionWebSocketClient extends WebSocketClient {
+public class CollectorWebSocketClient extends WebSocketClient {
 
-    private TransactionWebSocketClient(URI serverUri) {
+    private CollectorWebSocketClient(URI serverUri) {
         super(serverUri);
     }
 
-    public static TransactionWebSocketClient create(URI uri) {
-        return new TransactionWebSocketClient(uri);
+    public static CollectorWebSocketClient create(URI uri) {
+        return new CollectorWebSocketClient(uri);
     }
 
     @Override

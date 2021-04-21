@@ -1,28 +1,26 @@
 package com.capstone.apm.transaction.websocket.connection;
 
 import com.capstone.apm.transaction.websocket.ServerConfiguration;
-import com.capstone.apm.transaction.websocket.TransactionWebSocketClient;
+import com.capstone.apm.transaction.websocket.WebSocketFactory;
 import org.java_websocket.client.WebSocketClient;
 
-import java.net.ConnectException;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class WebSocketService {
 
     private Queue<WebSocketClient> clients;
     private ServerConfiguration configuration;
+    private WebSocketFactory factory;
 
-    private int size;
+    private int socketNum;
 
-    public WebSocketService(ServerConfiguration configuration, int size){
+    public WebSocketService(ServerConfiguration configuration, WebSocketFactory factory, int socketNum){
         clients = new LinkedList<>();
-        this.size = size;
+        this.socketNum = socketNum;
         this.configuration = configuration;
-        createClients(size);
+        this.factory = factory;
+        createClients(socketNum);
     }
 
     public WebSocketClient getClient() {
@@ -60,12 +58,12 @@ public class WebSocketService {
 
     private void createClients(int size) {
         for (int i = 0; i < size; i++) {
-            TransactionWebSocketClient client = makeClient();
+            WebSocketClient client = makeClient();
             clients.offer(client);
         }
     }
 
-    private TransactionWebSocketClient makeClient() {
-        return TransactionWebSocketClient.create(configuration.getUri());
+    private WebSocketClient makeClient() {
+        return factory.create(configuration.getUri());
     }
 }
