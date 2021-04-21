@@ -23,14 +23,18 @@ public class CollectorClient {
     private final String DEAD_BIT_URI = "/dead";
     private final String HEART_BIT_URI = "/heart";
 
+    private boolean isServerConnected;
+
     private CollectorClient(ServerConfiguration serverConfiguration) {
         this.configuration = serverConfiguration;
         this.webSocketService = new WebSocketService(serverConfiguration, new CollectorWebSocketFactory(), 5);
         this.okHttpClient = new OkHttpClient();
+        isServerConnected = false;
     }
 
     public static void initialize(ServerConfiguration serverConfiguration) {
         collectorClient = new CollectorClient(serverConfiguration);
+        collectorClient.sendBirthBit();
     }
 
     public static CollectorClient getInstance() {
@@ -38,6 +42,11 @@ public class CollectorClient {
     }
 
     public void sendMessage(String message) {
+        if(!isServerConnected) {
+            System.err.println("Server Not Connected");
+            sendBirthBit();
+        }
+
         WebSocketClient client = webSocketService.getClient();
         client.send(message);
         webSocketService.offerClient(client);
@@ -46,10 +55,11 @@ public class CollectorClient {
     public void sendBirthBit() {
         try {
             Request request = getPostRequest(configuration.getUri().toString() + BIRTH_BIT_URI, "");
-            Response response =
-                    okHttpClient.newCall(request).execute();
+            Response response = okHttpClient.newCall(request).execute();
+            isServerConnected = true;
             System.out.println(response.body().string());
         } catch (IOException e) {
+            isServerConnected = false;
             e.printStackTrace();
         }
     }
@@ -59,6 +69,7 @@ public class CollectorClient {
             Request request = getPostRequest(configuration.getUri().toString() + DEAD_BIT_URI, "");
             Response response =
                     okHttpClient.newCall(request).execute();
+            isServerConnected = false;
             System.out.println(response.body().string());
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,8 +79,7 @@ public class CollectorClient {
     public void sendHeartBit() {
         try {
             Request request = getPostRequest(configuration.getUri().toString() + HEART_BIT_URI, "");
-            Response response =
-                    okHttpClient.newCall(request).execute();
+            Response response = okHttpClient.newCall(request).execute();
             System.out.println(response.body().string());
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,4 +93,5 @@ public class CollectorClient {
                 .post(RequestBody.create(body.getBytes(StandardCharsets.UTF_8)))
                 .build();
     }
+
 }
