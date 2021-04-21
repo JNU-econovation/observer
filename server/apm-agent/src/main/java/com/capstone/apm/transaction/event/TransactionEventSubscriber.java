@@ -1,5 +1,6 @@
 package com.capstone.apm.transaction.event;
 
+import com.capstone.apm.collector.CollectorClient;
 import com.capstone.apm.commons.event.EventConfiguration;
 import com.capstone.apm.commons.event.EventSubscriber;
 import com.capstone.apm.transaction.websocket.ServerConfiguration;
@@ -13,10 +14,9 @@ public class TransactionEventSubscriber extends EventSubscriber<TransactionEvent
 
     private final TransactionEventHandler eventHandler;
 
-    public TransactionEventSubscriber(ServerConfiguration serverConfiguration,
-                                      EventConfiguration eventConfiguration) {
+    public TransactionEventSubscriber(EventConfiguration eventConfiguration) {
         super(eventConfiguration);
-        this.eventHandler = new TransactionEventHandler(serverConfiguration);
+        this.eventHandler = new TransactionEventHandler();
     }
 
     @Override

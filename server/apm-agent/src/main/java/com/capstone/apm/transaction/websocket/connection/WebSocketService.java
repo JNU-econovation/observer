@@ -23,11 +23,15 @@ public class WebSocketService {
         createClients(socketNum);
     }
 
-    public WebSocketClient getClient() {
+    public synchronized WebSocketClient getClient() {
         WebSocketClient client = getOrCreateClient();
         client = checkClientIsClosed(client);
         checkClientIsConnected(client);
         return client;
+    }
+
+    public synchronized void offerClient(WebSocketClient client) {
+        this.clients.offer(client);
     }
 
     private WebSocketClient getOrCreateClient() {
@@ -52,9 +56,6 @@ public class WebSocketService {
         }
     }
 
-    public void offerClient(WebSocketClient client) {
-        this.clients.offer(client);
-    }
 
     private void createClients(int size) {
         for (int i = 0; i < size; i++) {

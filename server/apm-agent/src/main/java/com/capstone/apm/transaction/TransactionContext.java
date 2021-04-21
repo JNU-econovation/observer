@@ -1,6 +1,8 @@
 package com.capstone.apm.transaction;
 
+import com.capstone.apm.collector.CollectorClient;
 import com.capstone.apm.commons.event.EventPublisher;
+import com.capstone.apm.commons.event.EventSubscriber;
 import com.capstone.apm.transaction.event.TransactionEvent;
 import com.capstone.apm.transaction.event.TransactionEventPublisher;
 import com.capstone.apm.transaction.event.TransactionEventSubscriber;
@@ -33,11 +35,12 @@ public class TransactionContext implements TransactionLifeCycle, TransactionProp
         this.transactionPropagation = new DefaultTransactionPropagation(transactionRepository);
 
         this.eventPublisher = new TransactionEventPublisher();
-        eventPublisher.subscribe(new TransactionEventSubscriber(
-                new ServerConfiguration("http://localhost:8082"),
-                new EventConfiguration(1)));
-
+        this.eventPublisher.subscribe(new TransactionEventSubscriber(new EventConfiguration(1)));
         this.transactionLifeCycle = new DefaultTransactionLifeCycle(transactionRepository, eventPublisher);
+    }
+
+    public void subscribe(EventSubscriber<? super TransactionEvent> subscriber){
+        this.eventPublisher.subscribe(subscriber);
     }
 
     public static TransactionContext getTransactionContext() {

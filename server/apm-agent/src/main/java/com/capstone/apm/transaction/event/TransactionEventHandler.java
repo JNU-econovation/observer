@@ -12,8 +12,8 @@ public class TransactionEventHandler {
 
     private final CollectorClient collectorClient;
 
-    public TransactionEventHandler(ServerConfiguration configuration) {
-        this.collectorClient = new CollectorClient(configuration);
+    public TransactionEventHandler() {
+        this.collectorClient = CollectorClient.getInstance();
     }
 
     public void handleEvent(TransactionEvent event){
