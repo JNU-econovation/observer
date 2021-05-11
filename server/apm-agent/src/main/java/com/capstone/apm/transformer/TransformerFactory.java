@@ -8,6 +8,8 @@ public class TransformerFactory {
         List<Transformer> transformers = new ArrayList<>();
         transformers.add(new TomcatTransformer());
         transformers.add(new RestTemplateTransformer());
+        transformers.add(new HibernateSelectTransformer());
+        transformers.add(new HibernateUpdateTransformer());
         return transformers;
     }
 }
