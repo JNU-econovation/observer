@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">observer</string>
+    <string name="app_name">observer_Android</string>
+    <string name="dash">-</string>
 </resources>

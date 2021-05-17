@@ -1,18 +1,18 @@
 plugins {
     id 'com.android.application'
 }
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.ecnv2021.observer"
-        minSdkVersion 21
+        applicationId "com.ecnv2021.observer_android"
+        minSdkVersion 18
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,5 +37,13 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
+    implementation 'dev.bandb.graphview:graphview:0.8.1'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.otaliastudios:zoomlayout:1.8.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+}
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }

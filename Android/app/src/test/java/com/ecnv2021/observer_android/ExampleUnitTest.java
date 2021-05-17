@@ -1,4 +1,4 @@
-package com.ecnv2021.observer;
+package com.ecnv2021.observer_android;
 
 import org.junit.Test;
 

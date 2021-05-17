@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "observer"
+rootProject.name = "observer_Android"

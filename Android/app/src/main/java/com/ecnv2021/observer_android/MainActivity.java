@@ -1,4 +1,4 @@
-package com.ecnv2021.observer;
+package com.ecnv2021.observer_android;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,15 +14,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = (Button) findViewById(R.id.button);
+        Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ServerMapActivity.class);
-                startActivity(intent);
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, NodesActivity.class));
             }
         });
-
 
     }
 }

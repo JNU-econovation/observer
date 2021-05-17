@@ -1,4 +1,4 @@
-package com.ecnv2021.observer;
+package com.ecnv2021.observer_android;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.ecnv2021.observer", appContext.getPackageName());
+        assertEquals("com.ecnv2021.observer_android", appContext.getPackageName());
     }
 }
