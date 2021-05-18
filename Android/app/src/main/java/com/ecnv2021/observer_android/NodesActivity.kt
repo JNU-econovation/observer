@@ -1,50 +1,39 @@
 package com.ecnv2021.observer_android
 
-import dev.bandb.graphview.decoration.edge.ArrowEdgeDecoration
 import dev.bandb.graphview.graph.Graph
 import dev.bandb.graphview.graph.Node
-import dev.bandb.graphview.layouts.energy.FruchtermanReingoldLayoutManager
-
+import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration
+import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration
+import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager
 
 class NodesActivity : ServerMapActivity() {
 
     public override fun setLayoutManager() {
-        recyclerView.layoutManager = FruchtermanReingoldLayoutManager(this, 1000)
+        recyclerView.layoutManager = SugiyamaLayoutManager(this, SugiyamaConfiguration.Builder().build())
     }
 
     public override fun setEdgeDecoration() {
-        recyclerView.addItemDecoration(ArrowEdgeDecoration())
+        recyclerView.addItemDecoration(SugiyamaArrowEdgeDecoration())
     }
 
     public override fun createGraph(): Graph {
         val graph = Graph()
-        /*val a = Node("user")
-        val b = Node(nodeText)
-        val c = Node(nodeText)
-        val d = Node(nodeText)
-        val e = Node(nodeText)
-        val f = Node(nodeText)
-        val g = Node(nodeText)
-        val h = Node(nodeText)
-        graph.addEdge(a, b)
-        graph.addEdge(a, c)
-        graph.addEdge(a, d)
-        graph.addEdge(c, e)
-        graph.addEdge(d, f)
-        graph.addEdge(f, c)
-        graph.addEdge(g, c)
-        graph.addEdge(h, g)*/
-        val user = Node("USER")
-        val frontweb = Node("FrontWeb")
-        val backend = Node("Backend")
-        val backweb = Node("BackendWeb")
-        val mysql = Node("mysql")
-        graph.addEdge(user,frontweb)
-        graph.addEdge(frontweb,Node("Cloud"))
-        graph.addEdge(frontweb,backweb)
-        graph.addEdge(frontweb,backend)
-        graph.addEdge(backend,mysql)
-        graph.addEdge(backweb,mysql)
+        val _nodes = arrayListOf<Node>()
+        val nodes: List<Node> = _nodes
+
+        _nodes.add(Node("user"))
+        _nodes.add(Node("frontweb"))
+        _nodes.add(Node("backend"))
+        _nodes.add(Node("backendWeb"))
+        _nodes.add(Node("mysql"))
+        _nodes.add(Node("Cloud"))
+        graph.addEdge(nodes.get(0),nodes.get(1))
+        graph.addEdge(nodes.get(1),nodes.get(5))
+        graph.addEdge(nodes.get(1),nodes.get(2))
+        graph.addEdge(nodes.get(1),nodes.get(3))
+        graph.addEdge(nodes.get(2),nodes.get(4))
+        graph.addEdge(nodes.get(3),nodes.get(4))
+
         return graph
     }
 }
