@@ -12,6 +12,7 @@ public class DatabaseConverter implements Converter<JSONObject, Transaction> {
         Transaction transaction = new Transaction();
         transaction.setTransactionTimeMillis(source.getLong("transactionTimeMillis"));
         transaction.setRemoteAddr(source.getString("dbHost"));
+        transaction.setClientAddr(source.getString("agentHost"));
         transaction.setRemoteServerType("Database");
         return transaction;
     }

@@ -15,6 +15,7 @@ public class TransactionConverter implements Converter<JSONObject, Transaction> 
         transaction.setTransactionTimeMillis(source.getLong("transactionTimeMillis"));
         transaction.setRemoteServerType("Service");
         transaction.setRemoteAddr(source.getString("serverName"));
+        transaction.setClientAddr(source.getString("clientAddr"));
         transaction.setStatusCode(source.getInt("statusCode"));
         transaction.setTraceId(source.getString("traceId"));
         return transaction;

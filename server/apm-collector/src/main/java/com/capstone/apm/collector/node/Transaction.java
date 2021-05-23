@@ -10,10 +10,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Getter @Setter
 public class Transaction {
-    
+
     private String transactionStatus;
 
     private String traceId;
+
+    private String clientAddr;
 
     private String remoteAddr;
 
