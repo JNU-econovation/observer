@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface NodeRepository extends MongoRepository<Node, String> {
 
-    Optional<Node> findByServerName(String serverName);
+    Optional<Node> findByServiceName(String serviceName);
 }

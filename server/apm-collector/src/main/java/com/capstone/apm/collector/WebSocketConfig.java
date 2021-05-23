@@ -10,10 +10,10 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 @Configuration
 public class WebSocketConfig implements WebSocketConfigurer {
-    private final TestHandler testHandler;
+    private final TransactionHandler transactionHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(testHandler, "/");
+        registry.addHandler(transactionHandler, "/");
     }
 }

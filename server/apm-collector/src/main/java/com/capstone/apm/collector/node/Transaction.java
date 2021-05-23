@@ -7,9 +7,12 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter @Setter
 public class Transaction {
+
+    @Id
+    private String id;
 
     private String transactionStatus;
 
@@ -19,9 +22,7 @@ public class Transaction {
 
     private String remoteServerType;
 
-    private long startTransactionTime;
-
-    private long endTransactionTime;
+    private long transactionTimeMillis;
 
     private int statusCode;
 

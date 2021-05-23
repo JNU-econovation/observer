@@ -1,5 +1,7 @@
 package com.capstone.apm.transaction;
 
+import com.capstone.apm.agent.Agent;
+
 public class TransactionDto {
 
     private TransactionDto(){}
@@ -9,28 +11,16 @@ public class TransactionDto {
     private String traceId;
     private String requestUri;
     private String clientAddr;
+    private String serverName;
+    private String serviceName;
+    private String serviceType;
 
-    private long startTransactionTime;
-    private long endTransactionTime;
+    private long transactionTimeMillis;
+
     private long threadId;
 
     private int statusCode;
     private int sequence;
-
-    @Override
-    public String toString() {
-        return "TransactionDto{" +
-                "transactionStatus='" + transactionStatus + '\'' +
-                ", traceId='" + traceId + '\'' +
-                ", requestUri='" + requestUri + '\'' +
-                ", clientAddr='" + clientAddr + '\'' +
-                ", startTransactionTime=" + startTransactionTime +
-                ", endTransactionTime=" + endTransactionTime +
-                ", threadId=" + threadId +
-                ", statusCode=" + statusCode +
-                ", sequence=" + sequence +
-                '}';
-    }
 
     public static TransactionDto of(Transaction transaction){
         TransactionDto transactionDto = new TransactionDto();
@@ -40,12 +30,14 @@ public class TransactionDto {
         transactionDto.requestUri = transaction.getRequestUri();
         transactionDto.clientAddr = transaction.getClientAddr();
 
-        transactionDto.startTransactionTime = transaction.getStartTransactionTime();
-        transactionDto.endTransactionTime = transaction.getEndTransactionTime();
+        transactionDto.transactionTimeMillis = transaction.getEndTransactionTime() - transaction.getStartTransactionTime();
         transactionDto.threadId = transaction.getThreadId();
-
         transactionDto.statusCode = transaction.getStatusCode();
         transactionDto.sequence = transaction.getSequence();
+
+        transactionDto.serviceName = Agent.SERVICE_NAME;
+        transactionDto.serverName = Agent.serverName + ":" + transaction.getServerPort();
+        transactionDto.serviceType = "Service";
 
         return transactionDto;
     }

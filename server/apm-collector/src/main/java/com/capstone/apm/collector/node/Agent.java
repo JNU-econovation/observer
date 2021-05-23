@@ -4,35 +4,32 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter
-@Setter(AccessLevel.PRIVATE)
+@Setter
 public class Agent {
+    @Id
+    private String id;
 
-    private String addr;
+    @Indexed(unique=true)
+    private String serverName;
 
     private List<Transaction> transactions = new ArrayList<>();
 
-    public static Agent create(Node node, String addr){
+    public static Agent create(Node node, String serverName){
         Agent agent = new Agent();
-        agent.addr = addr;
+        agent.serverName = serverName;
         node.saveAgent(agent);
         return agent;
     }
 
-    public void saveTransaction(TransactionDto transactionDto) {
-        Transaction transaction = new Transaction();
-        transaction.setStartTransactionTime(transactionDto.getStartTransactionTime());
-        transaction.setEndTransactionTime(transactionDto.getEndTransactionTime());
-        transaction.setTransactionStatus(transactionDto.getTransactionStatus());
-        transaction.setRemoteAddr(transactionDto.getRemoteAddr());
-        transaction.setSequence(transactionDto.getSequence());
-        transaction.setStatusCode(transactionDto.getStatusCode());
-        transaction.setRemoteServerType(transactionDto.getRemoteServerType());
+    public void saveTransaction(Transaction transaction) {
         this.transactions.add(transaction);
     }
 }

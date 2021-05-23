@@ -26,7 +26,7 @@ class DefaultTransactionLifeCycle implements TransactionLifeCycle {
 
         transactionRepository.addTransaction(transaction);
         TransactionDto transactionDto = TransactionDto.of(transaction);
-        eventPublisher.submit(new TransactionEvent(transactionDto));
+        //eventPublisher.submit(new TransactionEvent(transactionDto));
     }
 
     @Override

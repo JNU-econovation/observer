@@ -27,7 +27,7 @@ public class CollectorClient {
 
     private CollectorClient(ServerConfiguration serverConfiguration) {
         this.configuration = serverConfiguration;
-        this.webSocketService = new WebSocketService(serverConfiguration, new CollectorWebSocketFactory(), 5);
+        this.webSocketService = new WebSocketService(serverConfiguration, new CollectorWebSocketFactory(), 1);
         this.okHttpClient = new OkHttpClient();
         isServerConnected = false;
     }

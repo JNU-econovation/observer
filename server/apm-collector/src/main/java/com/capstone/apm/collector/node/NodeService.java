@@ -3,28 +3,29 @@ package com.capstone.apm.collector.node;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class NodeService {
 
     private final NodeRepository nodeRepository;
 
-    public String saveTransaction(TransactionDto transactionDto){
-        String serverName = transactionDto.getServerName();
-        Node node = nodeRepository.findByServerName(serverName).orElseGet(() -> Node.create(serverName));
-
-        String addr = transactionDto.getAddr();
-
+    public String save(Transaction transaction, String serviceName, String serverName) {
+        Node node = nodeRepository.findByServiceName(serviceName).orElseGet(() -> Node.create(serviceName));
         Agent findAgent = node.getAgents().stream()
-                .filter(agent -> agent.getAddr().equals(addr))
+                .filter(agent -> agent.getServerName().equals(serverName))
                 .findFirst()
-                .orElseGet(() -> Agent.create(node, addr));
+                .orElseGet(() -> Agent.create(node, serverName));
 
-        findAgent.saveTransaction(transactionDto);
+        findAgent.saveTransaction(transaction);
 
         nodeRepository.save(node);
-
         return node.getId();
+    }
+
+    public List<Node> findAll() {
+        return nodeRepository.findAll();
     }
 
     public Node findByNodeId(String nodeId){

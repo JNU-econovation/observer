@@ -7,6 +7,8 @@ import java.util.*;
 public class TransactionRequest implements Request {
     private String remoteAddr;
     private String requestUri;
+    private String serverName;
+    private String serverPort;
     private Map<String, String> headers;
 
     @Override
@@ -28,6 +30,15 @@ public class TransactionRequest implements Request {
         return headers;
     }
 
+    @Override
+    public String getServerName() {
+        return serverName;
+    }
+
+    @Override
+    public String getServerPort() {
+        return serverPort;
+    }
 
     public static TransactionRequest ofHttpServletRequest(HttpServletRequest request){
          TransactionRequest transactionRequest = new TransactionRequest();
@@ -41,9 +52,10 @@ public class TransactionRequest implements Request {
          }
 
          transactionRequest.headers = headers;
+         transactionRequest.serverName = request.getServerName();
          transactionRequest.requestUri = request.getRequestURI();
          transactionRequest.remoteAddr = request.getRemoteAddr();
-
+         transactionRequest.serverPort = request.getServerPort() + "";
          return transactionRequest;
     }
 }

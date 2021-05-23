@@ -1,5 +1,6 @@
 package com.capstone.apm.transformer;
 
+import com.capstone.apm.agent.Agent;
 import com.capstone.apm.transaction.TransactionContext;
 import com.capstone.apm.transaction.request.TransactionRequest;
 import com.capstone.apm.transaction.response.TransactionResponse;
@@ -40,6 +41,8 @@ public class TomcatTransformer extends AbstractTransformer{
             TransactionContext context = getTransactionContext();
             context.startTransaction(TransactionRequest
                     .ofHttpServletRequest((HttpServletRequest)servletRequest));
+
+            Agent.serverName = servletRequest.getServerName();
         }
 
         @Advice.OnMethodExit

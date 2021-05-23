@@ -13,6 +13,9 @@ import java.lang.instrument.Instrumentation;
 
 public class Agent {
 
+    public static String serverName;
+    public static final String SERVICE_NAME = "DEMO_SERVICE";
+
     public static void premain(String args, Instrumentation inst){
         ServerConfiguration serverConfiguration = new ServerConfiguration("http://localhost:8082");
         CollectorClient.initialize(serverConfiguration);

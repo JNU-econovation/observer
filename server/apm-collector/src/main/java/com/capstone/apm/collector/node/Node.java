@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,21 +13,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter
-@Setter(AccessLevel.PRIVATE)
+@Setter
 public class Node {
 
     @Id
     private String id;
 
-    private String serverName;
+    @Indexed(unique=true)
+    private String serviceName;
 
     private List<Agent> agents = new ArrayList<>();
 
-    public static Node create(String serverName){
+    public static Node create(String serviceName){
         Node node = new Node();
-        node.serverName = serverName;
+        node.serviceName = serviceName;
         return node;
     }
 

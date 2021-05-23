@@ -14,6 +14,8 @@ class Transaction {
     private String traceId;
     private String requestUri;
     private String clientAddr;
+    private String serverName;
+    private String serverPort;
 
     private long startTransactionTime;
     private long endTransactionTime;
@@ -44,18 +46,20 @@ class Transaction {
     }
 
     public void start(Request request) {
-        this.startTransactionTime = System.nanoTime();
+        this.startTransactionTime = System.currentTimeMillis();
         this.threadId = Thread.currentThread().getId();
         this.traceId = getOrCreateTraceId(request);
         this.sequence = getOrCreateSequence(request);
         this.clientAddr = request.getRemoteAddr();
         this.requestUri = request.getRequestURI();
+        this.serverName = request.getServerName();
+        this.serverPort = request.getServerPort();
         this.transactionStatus = TransactionStatus.START;
     }
 
     public void end(Response response){
         this.statusCode = response.getStatusCode();
-        this.endTransactionTime = System.nanoTime();
+        this.endTransactionTime = System.currentTimeMillis();
         this.transactionStatus = TransactionStatus.END;
     }
 
@@ -116,5 +120,10 @@ class Transaction {
     public String getRequestUri() {
         return requestUri;
     }
-
+    public String getServerName() {
+        return serverName;
+    }
+    public String getServerPort() {
+        return serverPort;
+    }
 }
