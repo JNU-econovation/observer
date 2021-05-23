@@ -14,8 +14,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Agent {
-    @Id
-    private String id;
 
     @Indexed(unique=true)
     private String serverName;

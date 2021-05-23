@@ -10,10 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Getter @Setter
 public class Transaction {
-
-    @Id
-    private String id;
-
+    
     private String transactionStatus;
 
     private String traceId;
