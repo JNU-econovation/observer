@@ -1,9 +1,12 @@
 package com.ecnv2021.observer_android;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 
 public class NodeVO {
     private int size;
+    private ArrayList<Node> list;
 
     public int getSize() {
         return size;
@@ -12,8 +15,6 @@ public class NodeVO {
     public void setSize(int size) {
         this.size = size;
     }
-
-    private ArrayList<Node> list;
 
     public ArrayList<Node> getList() {
         return list;
@@ -24,15 +25,20 @@ public class NodeVO {
     }
 }
 
-class Node{
-    private int id;
+class Node {
+    private String id;
     private String name;
 
-    public int getId() {
+    public Node(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

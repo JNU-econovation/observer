@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,11 +18,6 @@
         tools:visibility="visible"
         android:src="@drawable/ic_add_white_24dp" />
 
-    <com.otaliastudios.zoom.ZoomLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical|horizontal"
-        app:hasClickableChildren="true">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
@@ -29,6 +25,7 @@
             android:layout_height="match_parent"
             android:padding="50dp"
             android:layout_marginTop="?attr/actionBarSize" />
-    </com.otaliastudios.zoom.ZoomLayout>
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

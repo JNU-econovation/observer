@@ -1,22 +1,16 @@
 
 package com.ecnv2021.observer_android;
 
-import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-
-import com.ecnv2021.observer_android.scatterchart.CustomScatterShapeRenderer;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -28,19 +22,31 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.ecnv2021.observer_android.scatterchart.CustomScatterShapeRenderer;
 import com.ecnv2021.observer_android.scatterchart.DemoBase;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeListener,
         OnChartValueSelectedListener {
 
     private ScatterChart chart;
     private SeekBar seekBarX, seekBarY;
-    private TextView tvX, tvY;
 
+    private static Retrofit mRetrofit;
+    private static RetrofitAPI mRetrofitAPI;
+    private Gson mGson;
+    private static StatisticsVO statisticsResult;
+    public static final String TAG = "statisticsResult";
+    public static TextView textView1, textView2;
+
+    public static String id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,10 +54,12 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_scatterchart);
 
-        setTitle("ScatterChartActivity");
+        Intent secondIntent = getIntent();
+        id = secondIntent.getStringExtra("id");
 
-        tvX = findViewById(R.id.tvXMax);
-        tvY = findViewById(R.id.tvYMax);
+        setTitle("ScatterChart");
+        textView1 = findViewById(R.id.textView1);
+        textView2 = findViewById(R.id.textView2);
 
         seekBarX = findViewById(R.id.seekBar1);
         seekBarX.setOnSeekBarChangeListener(this);
@@ -74,8 +82,8 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
         chart.setMaxVisibleValueCount(200);
         chart.setPinchZoom(true);
 
-        seekBarX.setProgress(45);
-        seekBarY.setProgress(100);
+        seekBarX.setProgress(500);
+        seekBarY.setProgress(200);
 
         Legend l = chart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -94,17 +102,65 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
         XAxis xl = chart.getXAxis();
         xl.setTypeface(tfLight);
         xl.setDrawGridLines(false);
+
+        //통계 데이터 UI 세팅
+        setStatisticsResult();
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+    public void setRetrofitInit() {
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl("<Base URL>")
+                 .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        mRetrofitAPI = mRetrofit.create(RetrofitAPI.class);
+    }
 
-        tvX.setText(String.valueOf(seekBarX.getProgress()));
-        tvY.setText(String.valueOf(seekBarY.getProgress()));
+    private static void callStatisticsList() {
 
+        final Call<StatisticsVO> repos = mRetrofitAPI.getStatisticsList(id);
+
+        //동기 호출
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    @SuppressLint("StaticFieldLeak") Response<StatisticsVO> list = repos.execute();
+                    statisticsResult = list.body();
+                    Log.d(TAG, "onResponse: 성공 + 결과 : " + list.toString().substring(0,6));
+                    Log.d(TAG, "onResponse_xValueResult : " + statisticsResult.getSuccessList().get(0).getxValue());
+                } catch (IOException e) {
+                    Log.d(TAG, "onResponse: 실패");
+                }
+                return null;
+            }
+
+            @SuppressLint("StaticFieldLeak")
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                ArrayList<Entry> values1 = new ArrayList<>();
+                ArrayList<Entry> values2 = new ArrayList<>();
+                super.onPostExecute(aVoid);
+                for (int i = 0; i < statisticsResult.getSuccessList().size(); i++) {
+                    float x = statisticsResult.getSuccessList().get(i).getxValue();
+                    float y = statisticsResult.getSuccessList().get(i).getyValue();
+                    values1.add(new Entry(x,y));
+                }
+
+                for (int i = 0; i < statisticsResult.getFailList().size(); i++) {
+                    float x = statisticsResult.getFailList().get(i).getxValue();
+                    float y = statisticsResult.getFailList().get(i).getyValue();
+                    values1.add(new Entry(x,y));
+                }
+
+                textView1.setText("Success: "+statisticsResult.getSuccessNum());
+                textView2.setText("Success: "+statisticsResult.getFailNum());
+            }
+        }.execute();
+    }
+
+    public void setStatisticsResult(){
         ArrayList<Entry> values1 = new ArrayList<>();
         ArrayList<Entry> values2 = new ArrayList<>();
-        ArrayList<Entry> values3 = new ArrayList<>();
 
         for (int i = 0; i < seekBarX.getProgress(); i++) {
             float val = (float) (Math.random() * seekBarY.getProgress()) + 3;
@@ -116,32 +172,26 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
             values2.add(new Entry(i+0.33f, val));
         }
 
-        for (int i = 0; i < seekBarX.getProgress(); i++) {
-            float val = (float) (Math.random() * seekBarY.getProgress()) + 3;
-            values3.add(new Entry(i+0.66f, val));
-        }
 
         // create a dataset and give it a type
-        ScatterDataSet set1 = new ScatterDataSet(values1, "DS 1");
-        set1.setScatterShape(ScatterChart.ScatterShape.SQUARE);
-        set1.setColor(ColorTemplate.COLORFUL_COLORS[0]);
-        ScatterDataSet set2 = new ScatterDataSet(values2, "DS 2");
-        set2.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-        set2.setScatterShapeHoleColor(ColorTemplate.COLORFUL_COLORS[3]);
+        ScatterDataSet set1 = new ScatterDataSet(values1, "Success");
+        set1.setScatterShape((ScatterChart.ScatterShape.CIRCLE));
+        set1.setColor(ColorTemplate.getHoloBlue());
+        set1.setScatterShapeHoleRadius(3f);
+        set1.setScatterShapeHoleColor(ColorTemplate.getHoloBlue());
+        ScatterDataSet set2 = new ScatterDataSet(values2, "Fail");
+        set2.setScatterShape((ScatterChart.ScatterShape.CIRCLE));
+        set2.setScatterShapeHoleColor(ColorTemplate.COLORFUL_COLORS[0]);
         set2.setScatterShapeHoleRadius(3f);
-        set2.setColor(ColorTemplate.COLORFUL_COLORS[1]);
-        ScatterDataSet set3 = new ScatterDataSet(values3, "DS 3");
-        set3.setShapeRenderer(new CustomScatterShapeRenderer());
-        set3.setColor(ColorTemplate.COLORFUL_COLORS[2]);
+        set2.setColor(ColorTemplate.COLORFUL_COLORS[0]);
+
 
         set1.setScatterShapeSize(8f);
         set2.setScatterShapeSize(8f);
-        set3.setScatterShapeSize(8f);
 
         ArrayList<IScatterDataSet> dataSets = new ArrayList<>();
         dataSets.add(set1); // add the data sets
         dataSets.add(set2);
-        dataSets.add(set3);
 
         // create a data object with the data sets
         ScatterData data = new ScatterData(dataSets);
@@ -149,6 +199,10 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
 
         chart.setData(data);
         chart.invalidate();
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
     }
 
     @Override

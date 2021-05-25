@@ -2,45 +2,77 @@ package com.ecnv2021.observer_android
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dev.bandb.graphview.AbstractGraphAdapter
 import dev.bandb.graphview.graph.Graph
 import dev.bandb.graphview.graph.Node
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 abstract class ServerMapActivity : AppCompatActivity() {
     protected lateinit var recyclerView: RecyclerView
     protected lateinit var adapter: AbstractGraphAdapter<NodeViewHolder>
-    private lateinit var fab: FloatingActionButton
     private var currentNode: Node? = null
-    private var nodeCount = 1
 
     protected abstract fun createGraph(): Graph
     protected abstract fun setLayoutManager()
     protected abstract fun setEdgeDecoration()
+    protected abstract suspend fun callTestList()
+    protected abstract fun setRetrofitInit()
+    protected abstract suspend fun callNodeList()
+    protected abstract suspend fun callEdgeList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_graph)
 
-        val graph = createGraph()
-        recyclerView = findViewById(R.id.recycler)
-        setLayoutManager()
-        setEdgeDecoration()
-        setupGraphView(graph)
+        var graph: Graph? = null
 
-        setupFab(graph)
+        //api 서버 연결 init
+        setRetrofitInit()
+
+        //Test PostResult 받아오기
+        runBlocking {
+            GlobalScope.launch {
+                callTestList()
+            }
+        }
+
+        //서버에서 Node, Edge정보 가져오기
+        /*
+        runBlocking {
+            GlobalScope.launch {
+                callNodeList()
+                callEdgeList()
+            }
+        }*/
+
+        //서버맵 UI 세팅
+        Handler().postDelayed({
+            graph = createGraph()
+
+            recyclerView = findViewById(R.id.recycler)
+            setLayoutManager()
+            setEdgeDecoration()
+            setupGraphView(graph)
+        }, 1000L)
+
     }
 
-    private fun setupGraphView(graph: Graph) {
+    private fun setupGraphView(graph: Graph?) {
         adapter = object : AbstractGraphAdapter<NodeViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeViewHolder {
                 val view = LayoutInflater.from(parent.context)
@@ -57,28 +89,6 @@ abstract class ServerMapActivity : AppCompatActivity() {
 
     }
 
-    private fun setupFab(graph: Graph) {
-        fab = findViewById(R.id.addNode)
-        fab.setOnClickListener {
-            val newNode = Node(nodeText)
-            if (currentNode != null) {
-                graph.addEdge(currentNode!!, newNode)
-            } else {
-                graph.addNode(newNode)
-            }
-            adapter.notifyDataSetChanged()
-        }
-        fab.setOnLongClickListener {
-            if (currentNode != null) {
-                graph.removeNode(currentNode!!)
-                currentNode = null
-                adapter.notifyDataSetChanged()
-                fab.hide()
-            }
-            true
-        }
-    }
-
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
@@ -90,18 +100,12 @@ abstract class ServerMapActivity : AppCompatActivity() {
 
         init {
             itemView.setOnClickListener {
-                if (!fab.isShown) {
-                    fab.show()
-                }
                 val nextIntent = Intent(this@ServerMapActivity, ScatterChartActivity::class.java)
+                nextIntent.putExtra("id", "1")
                 startActivity(nextIntent)
                 currentNode = adapter.getNode(bindingAdapterPosition)
-                Snackbar.make(itemView, "Clicked on " + adapter.getNodeData(bindingAdapterPosition)?.toString(),
-                        Snackbar.LENGTH_SHORT).show()
             }
         }
     }
 
-    protected val nodeText: String
-        get() = "Node " + nodeCount++
 }
