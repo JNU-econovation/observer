@@ -1,8 +1,8 @@
-package com.capstone.apm.commons.util;
-
-import org.junit.jupiter.api.Test;
-
-class RandomUtilTest {
-
-
-}
+//package com.capstone.apm.commons.util;
+//
+//import org.junit.jupiter.api.Test;
+//
+//class RandomUtilTest {
+//
+//
+//}
