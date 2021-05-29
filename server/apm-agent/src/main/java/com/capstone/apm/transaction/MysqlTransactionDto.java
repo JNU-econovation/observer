@@ -10,12 +10,14 @@ public class MysqlTransactionDto {
     private String serverName;
     private String serviceType;
 
+    private long transactionStartTime;
     private long transactionTimeMillis;
     
-    public MysqlTransactionDto(String dbHost, String agentHost, String serviceName, long transactionTimeMillis) {
+    public MysqlTransactionDto(String dbHost, String agentHost, String serviceName, long transactionStartTime, long transactionTimeMillis) {
         this.dbHost = dbHost;
         this.agentHost = agentHost;
         this.serviceName = serviceName;
+        this.transactionStartTime = transactionStartTime;
         this.transactionTimeMillis = transactionTimeMillis;
         this.serverName = Agent.serverName;
         this.serviceType = "Database";

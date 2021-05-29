@@ -43,15 +43,15 @@ public class HibernateSelectTransformer extends AbstractTransformer {
         
         @Advice.OnMethodExit
         private static void exit(
-                @Advice.Enter long transactionEnterTime,
+                @Advice.Enter long transactionStartTime,
                 @Advice.This Object statement) throws SQLException {
             CollectorClient collectorClient = CollectorClient.getInstance();
             ClientPreparedStatement clientPreparedStatement = (ClientPreparedStatement) statement;
             Connection connection = clientPreparedStatement.getConnection();
             String url = connection.getMetaData().getURL();
             String dbHost = UrlParser.parseToHost(url);
-            long transactionTime = System.currentTimeMillis() - transactionEnterTime;
-            MysqlTransactionDto mysqlTransactionDto = new MysqlTransactionDto(dbHost, AGENT_HOST, SERVICE_NAME, transactionTime);
+            long transactionTime = System.currentTimeMillis() - transactionStartTime;
+            MysqlTransactionDto mysqlTransactionDto = new MysqlTransactionDto(dbHost, AGENT_HOST, SERVICE_NAME, transactionStartTime, transactionTime);
             collectorClient.sendMessage(Serializer.serialize(mysqlTransactionDto));
         }
     }
