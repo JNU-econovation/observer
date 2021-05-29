@@ -23,7 +23,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0'
     implementation 'org.json:json:20201115'
 
     compileOnly 'org.projectlombok:lombok'
