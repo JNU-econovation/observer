@@ -26,11 +26,11 @@ public class ServerMapController {
     
     @GetMapping("/edges")
     public ResponseEntity getEdges() {
-        Map<String, List<EdgeResponseDTO>> result
-                = new LinkedMultiValueMap();
+        Map<String, Object> result = new HashMap<>();
         String key = "edges";
         List<EdgeResponseDTO> value = new ArrayList<>();
         List<Node> nodes = nodeRepository.findAll();
+
         for (Node node : nodes) {
             for (Agent agent : node.getAgents()) {
                 List<Transaction> transactions = agent.getTransactions();
@@ -53,39 +53,37 @@ public class ServerMapController {
         return ResponseEntity.ok(result);
     }
     
-    @GetMapping("/nodes/{name}/statistics")
-    public ResponseEntity getNodeStatistics(@PathVariable("id") Integer id) {
+    @GetMapping("/nodes/{serviceName}/statistics")
+    public ResponseEntity getNodeStatistics(@PathVariable("serviceName") String serviceName) throws Exception {
         Map<String, Object> result = new HashMap<>();
         List<TransactionResponseDTO> successTransactions = new ArrayList<>();
         List<TransactionResponseDTO> failTransactions = new ArrayList<>();
 
-        List<Node> nodes = nodeRepository.findAll();
-        for (Node node : nodes) {
-            List<Agent> agents = node.getAgents();
-            for (Agent agent : agents) {
-                List<Transaction> transactions = agent.getTransactions();
-                for (Transaction transaction : transactions) {
-                    int statusCode = transaction.getStatusCode();
-                    int hour = new Date(transaction.getTransactionStartTime()).toInstant()
-                            .atZone(ZoneId.systemDefault()).getHour();
-                    int minute = new Date(transaction.getTransactionStartTime()).toInstant()
-                            .atZone(ZoneId.systemDefault()).getMinute();
-                    int transactionMinute = hour * 60 + minute;
-                    if (isSuccessStatusCode(statusCode)) {
-                        successTransactions.add(
-                                new TransactionResponseDTO(
-                                        transactionMinute,
-                                        transaction.getTransactionTimeMillis()
-                                )
-                        );
-                    } else {
-                        failTransactions.add(
-                                new TransactionResponseDTO(
-                                        transactionMinute,
-                                        transaction.getTransactionTimeMillis()
-                                )
-                        );
-                    }
+        Node node = nodeRepository.findByServiceName(serviceName).orElseThrow(RuntimeException::new);
+        List<Agent> agents = node.getAgents();
+        for (Agent agent : agents) {
+            List<Transaction> transactions = agent.getTransactions();
+            for (Transaction transaction : transactions) {
+                int statusCode = transaction.getStatusCode();
+                int hour = new Date(transaction.getTransactionStartTime()).toInstant()
+                        .atZone(ZoneId.systemDefault()).getHour();
+                int minute = new Date(transaction.getTransactionStartTime()).toInstant()
+                        .atZone(ZoneId.systemDefault()).getMinute();
+                int transactionMinute = hour * 60 + minute;
+                if (isSuccessStatusCode(statusCode)) {
+                    successTransactions.add(
+                            new TransactionResponseDTO(
+                                    transactionMinute,
+                                    transaction.getTransactionTimeMillis()
+                            )
+                    );
+                } else {
+                    failTransactions.add(
+                            new TransactionResponseDTO(
+                                    transactionMinute,
+                                    transaction.getTransactionTimeMillis()
+                            )
+                    );
                 }
             }
         }
@@ -98,7 +96,7 @@ public class ServerMapController {
         result.put("successNum", successTransactionCount);
         result.put("failNum", failTransactionCount);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(result);
     }
 
     private boolean isSuccessStatusCode(int statusCode) {
@@ -118,15 +116,15 @@ public class ServerMapController {
         List<Node> nodes = nodeRepository.findAll();
         for (Node node : nodes) {
             List<Agent> agents = node.getAgents();
+            String nodeName = node.getServiceName();
             for (Agent agent : agents) {
-                String serverName = agent.getServerName();
                 List<Transaction> transactions = agent.getTransactions();
                 if (transactions.isEmpty()) {
                     break;
                 } else {
                     Transaction transaction = transactions.get(0);
                     String remoteAddr = transaction.getRemoteAddr();
-                    NodeResponseDTO nodeResponseDTO = new NodeResponseDTO(remoteAddr, serverName);
+                    NodeResponseDTO nodeResponseDTO = new NodeResponseDTO(remoteAddr, nodeName);
                     nodeResult.add(nodeResponseDTO);
                 }
             }
