@@ -12,6 +12,7 @@ public class TransactionConverter implements Converter<JSONObject, Transaction> 
     public Transaction convert(JSONObject source) {
         Transaction transaction = new Transaction();
         transaction.setTransactionStatus(source.getString("transactionStatus"));
+        transaction.setTransactionStartTime(source.getLong("transactionStartTime"));
         transaction.setTransactionTimeMillis(source.getLong("transactionTimeMillis"));
         transaction.setRemoteServerType("Service");
         transaction.setRemoteAddr(source.getString("serverName"));
