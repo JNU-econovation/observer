@@ -18,7 +18,9 @@ public class Transaction {
     private String remoteAddr;
     
     private String remoteServerType;
-    
+
+    private long transactionStartTime;
+
     private long transactionTimeMillis;
     
     private int statusCode;
