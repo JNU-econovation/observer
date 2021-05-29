@@ -15,6 +15,7 @@ public class TransactionDto {
     private String serviceName;
     private String serviceType;
 
+    private long transactionStartTime;
     private long transactionTimeMillis;
 
     private long threadId;
@@ -30,6 +31,7 @@ public class TransactionDto {
         transactionDto.requestUri = transaction.getRequestUri();
         transactionDto.clientAddr = transaction.getClientAddr();
 
+        transactionDto.transactionStartTime = transaction.getStartTransactionTime();
         transactionDto.transactionTimeMillis = transaction.getEndTransactionTime() - transaction.getStartTransactionTime();
         transactionDto.threadId = transaction.getThreadId();
         transactionDto.statusCode = transaction.getStatusCode();
