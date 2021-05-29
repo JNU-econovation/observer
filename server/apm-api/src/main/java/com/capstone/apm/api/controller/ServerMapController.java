@@ -1,24 +1,19 @@
 package com.capstone.apm.api.controller;
 
-import com.capstone.apm.api.domain.Agent;
-import com.capstone.apm.api.domain.Node;
-import com.capstone.apm.api.domain.Transaction;
+import com.capstone.apm.api.Agent;
+import com.capstone.apm.api.Node;
+import com.capstone.apm.api.Transaction;
 import com.capstone.apm.api.repository.NodeRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneId;
+import java.util.*;
 
 @RestController
 public class ServerMapController {
@@ -60,10 +55,61 @@ public class ServerMapController {
     
     @GetMapping("/nodes/{name}/statistics")
     public ResponseEntity getNodeStatistics(@PathVariable("id") Integer id) {
-        
+        Map<String, Object> result = new HashMap<>();
+        List<TransactionResponseDTO> successTransactions = new ArrayList<>();
+        List<TransactionResponseDTO> failTransactions = new ArrayList<>();
+
+        List<Node> nodes = nodeRepository.findAll();
+        for (Node node : nodes) {
+            List<Agent> agents = node.getAgents();
+            for (Agent agent : agents) {
+                List<Transaction> transactions = agent.getTransactions();
+                for (Transaction transaction : transactions) {
+                    int statusCode = transaction.getStatusCode();
+                    int hour = new Date(transaction.getTransactionStartTime()).toInstant()
+                            .atZone(ZoneId.systemDefault()).getHour();
+                    int minute = new Date(transaction.getTransactionStartTime()).toInstant()
+                            .atZone(ZoneId.systemDefault()).getMinute();
+                    int transactionMinute = hour * 60 + minute;
+                    if (isSuccessStatusCode(statusCode)) {
+                        successTransactions.add(
+                                new TransactionResponseDTO(
+                                        transactionMinute,
+                                        transaction.getTransactionTimeMillis()
+                                )
+                        );
+                    } else {
+                        failTransactions.add(
+                                new TransactionResponseDTO(
+                                        transactionMinute,
+                                        transaction.getTransactionTimeMillis()
+                                )
+                        );
+                    }
+                }
+            }
+        }
+
+        int successTransactionCount = successTransactions.size();
+        int failTransactionCount = failTransactions.size();
+
+        result.put("successList", successTransactions);
+        result.put("failList", failTransactions);
+        result.put("successNum", successTransactionCount);
+        result.put("failNum", failTransactionCount);
+
         return ResponseEntity.ok().build();
     }
-    
+
+    private boolean isSuccessStatusCode(int statusCode) {
+        int flag = statusCode / 100;
+        if (flag == 5) {
+            return false;
+        }
+
+        return true;
+    }
+
     @GetMapping("/nodes")
     public ResponseEntity getNodes() {
         Map<String, Object> result = new HashMap<>();
@@ -105,5 +151,12 @@ public class ServerMapController {
     private static class NodeResponseDTO {
         private String address;
         private String name;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    private static class TransactionResponseDTO {
+        private long transactionStartTime;
+        private long transactionTimeMillis;
     }
 }

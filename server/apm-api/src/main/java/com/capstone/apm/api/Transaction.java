@@ -1,4 +1,4 @@
-package com.capstone.apm.api.domain;
+package com.capstone.apm.api;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
