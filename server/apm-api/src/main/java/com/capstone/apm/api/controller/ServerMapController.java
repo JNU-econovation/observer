@@ -13,24 +13,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @RestController
 public class ServerMapController {
-    
+
     private final NodeRepository nodeRepository;
-    
+
     public ServerMapController(NodeRepository nodeRepository) {
         this.nodeRepository = nodeRepository;
     }
-    
+
     @GetMapping("/edges")
     public ResponseEntity getEdges() {
         Map<String, Object> result = new HashMap<>();
         String key = "edges";
         List<EdgeResponseDTO> value = new ArrayList<>();
         List<Node> nodes = nodeRepository.findAll();
-
+        nodes.removeIf(node -> !isCreatedToday(node));
         for (Node node : nodes) {
             for (Agent agent : node.getAgents()) {
                 List<Transaction> transactions = agent.getTransactions();
@@ -47,23 +48,29 @@ public class ServerMapController {
                 }
             }
         }
-        
+
         result.put(key, value);
-        
+
         return ResponseEntity.ok(result);
     }
-    
+
     @GetMapping("/nodes/{serviceName}/statistics")
     public ResponseEntity getNodeStatistics(@PathVariable("serviceName") String serviceName) throws Exception {
         Map<String, Object> result = new HashMap<>();
         List<TransactionResponseDTO> successTransactions = new ArrayList<>();
         List<TransactionResponseDTO> failTransactions = new ArrayList<>();
 
-        Node node = nodeRepository.findByServiceName(serviceName).orElseThrow(RuntimeException::new);
+        Node node = nodeRepository.findByServiceName(serviceName).orElseThrow(NoSuchElementException::new);
+        if (!isCreatedToday(node)) {
+            throw new NoSuchElementException();
+        }
+        
         List<Agent> agents = node.getAgents();
         for (Agent agent : agents) {
             List<Transaction> transactions = agent.getTransactions();
             for (Transaction transaction : transactions) {
+                if (!isCreatedToday(transaction)) continue;
+                
                 int statusCode = transaction.getStatusCode();
                 int hour = new Date(transaction.getTransactionStartTime()).toInstant()
                         .atZone(ZoneId.systemDefault()).getHour();
@@ -112,8 +119,9 @@ public class ServerMapController {
     public ResponseEntity getNodes() {
         Map<String, Object> result = new HashMap<>();
         List<NodeResponseDTO> nodeResult = new ArrayList<>();
-        
+
         List<Node> nodes = nodeRepository.findAll();
+        nodes.removeIf(node -> !isCreatedToday(node));
         for (Node node : nodes) {
             List<Agent> agents = node.getAgents();
             String nodeName = node.getServiceName();
@@ -129,21 +137,45 @@ public class ServerMapController {
                 }
             }
         }
-        
+
+
+
         Integer count = nodeResult.size();
         result.put("size", count);
         result.put("nodes", nodeResult);
-        
+
         return ResponseEntity.ok(result);
     }
+
+    private boolean isCreatedToday(Node node) {
+        for (Agent agent : node.getAgents()) {
+            for (Transaction transaction : agent.getTransactions()) {
+                ZonedDateTime transactionDateTime = new Date(transaction.getTransactionStartTime()).toInstant().atZone(ZoneId.systemDefault());
+                ZonedDateTime todayDateTime = new Date(System.currentTimeMillis()).toInstant().atZone(ZoneId.systemDefault());
+                if (transactionDateTime.getDayOfYear() == todayDateTime.getDayOfYear()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     
+    private boolean isCreatedToday(Transaction transaction) {
+        ZonedDateTime transactionDateTime = new Date(transaction.getTransactionStartTime()).toInstant().atZone(ZoneId.systemDefault());
+        ZonedDateTime todayDateTime = new Date(System.currentTimeMillis()).toInstant().atZone(ZoneId.systemDefault());
+        if (transactionDateTime.getDayOfYear() == todayDateTime.getDayOfYear()) {
+            return true;
+        }
+        return false;
+    }
+
     @AllArgsConstructor
     @Getter
     private static class EdgeResponseDTO {
         private String clientAddr;
         private String remoteAddr;
     }
-    
+
     @AllArgsConstructor
     @Getter
     private static class NodeResponseDTO {
