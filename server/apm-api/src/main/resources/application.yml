@@ -4,4 +4,5 @@ server:
 spring:
   data:
     mongodb:
-      uri:
+      uri: ${MONGODB_URL}
+
