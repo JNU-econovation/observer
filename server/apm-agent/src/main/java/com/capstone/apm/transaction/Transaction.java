@@ -50,7 +50,7 @@ class Transaction {
         this.threadId = Thread.currentThread().getId();
         this.traceId = getOrCreateTraceId(request);
         this.sequence = getOrCreateSequence(request);
-        this.clientAddr = request.getRemoteAddr();
+        this.clientAddr = request.getClientAddr();
         this.requestUri = request.getRequestURI();
         this.serverName = request.getServerName();
         this.serverPort = request.getServerPort();

@@ -11,11 +11,11 @@ public class MongoConfig  {
 
     @Bean
     public MongoClient mongoClient() {
-        return MongoClients.create();
+        return MongoClients.create("{mongo_url}");
     }
 
     @Bean
     public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(mongoClient(), "dbName");
+        return new MongoTemplate(mongoClient(), "{dbName}");
     }
 }

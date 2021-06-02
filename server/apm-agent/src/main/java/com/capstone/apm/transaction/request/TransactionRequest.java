@@ -5,15 +5,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 public class TransactionRequest implements Request {
-    private String remoteAddr;
+    private String clientAddr;
     private String requestUri;
     private String serverName;
     private String serverPort;
     private Map<String, String> headers;
 
+
     @Override
-    public String getRemoteAddr() {
-        return remoteAddr;
+    public String getClientAddr() {
+        return clientAddr;
     }
 
     @Override
@@ -54,7 +55,7 @@ public class TransactionRequest implements Request {
          transactionRequest.headers = headers;
          transactionRequest.serverName = request.getServerName();
          transactionRequest.requestUri = request.getRequestURI();
-         transactionRequest.remoteAddr = request.getRemoteAddr();
+         transactionRequest.clientAddr = (request.getHeader("X-FORWARDED-FOR") != null) ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr();
          transactionRequest.serverPort = request.getServerPort() + "";
          return transactionRequest;
     }
