@@ -1,26 +1,27 @@
 package com.ecnv2021.observer_android;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class StatisticsVO {
-    private ArrayList<Values> successList = new ArrayList<>();
-    private ArrayList<Values> failList = new ArrayList<>();
+    private List<TransactionResponseDTO> successList = new ArrayList<>();
+    private List<TransactionResponseDTO> failList = new ArrayList<>();
     private int successNum;
     private int failNum;
 
-    public ArrayList<Values> getSuccessList() {
+    public List<TransactionResponseDTO> getSuccessList() {
         return successList;
     }
 
-    public void setSuccessList(ArrayList<Values> successList) {
+    public void setSuccessList(ArrayList<TransactionResponseDTO> successList) {
         this.successList = successList;
     }
 
-    public ArrayList<Values> getFailList() {
+    public List<TransactionResponseDTO> getFailList() {
         return failList;
     }
 
-    public void setFailList(ArrayList<Values> failList) {
+    public void setFailList(ArrayList<TransactionResponseDTO> failList) {
         this.failList = failList;
     }
 
@@ -39,24 +40,26 @@ public class StatisticsVO {
     public void setFailNum(int failNum) {
         this.failNum = failNum;
     }
+
 }
-class Values{
-    private float xValue;
-    private float yValue;
 
-    public float getxValue() {
-        return xValue;
+class TransactionResponseDTO {
+    private long transactionStartTime;
+    private long transactionTimeMillis;
+
+    public long getTransactionStartTime() {
+        return transactionStartTime;
     }
 
-    public void setxValue(float xValue) {
-        this.xValue = xValue;
+    public void setTransactionStartTime(int transactionStartTime) {
+        this.transactionStartTime = transactionStartTime;
     }
 
-    public float getyValue() {
-        return yValue;
+    public long getTransactionTimeMillis() {
+        return transactionTimeMillis;
     }
 
-    public void setyValue(float yValue) {
-        this.yValue = yValue;
+    public void setTransactionTimeMillis(int transactionTimeMillis) {
+        this.transactionTimeMillis = transactionTimeMillis;
     }
 }

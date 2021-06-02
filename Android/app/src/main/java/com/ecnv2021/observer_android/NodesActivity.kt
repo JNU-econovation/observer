@@ -22,13 +22,13 @@ class NodesActivity : ServerMapActivity() {
     private lateinit var mRetrofitAPI: RetrofitAPI
     private val mGson: Gson? = null
     val _nodes = arrayListOf<Node>()
-    private val TAG = "testNode"
-    var postResult: PostResult? = null
+    private val TAG = "TTestNode"
     var nodeResult: NodeVO? = null
     var edgeResult: EdgeVO? = null
 
     public override fun setLayoutManager() {
-        recyclerView.layoutManager = SugiyamaLayoutManager(this, SugiyamaConfiguration.Builder().build())
+        recyclerView.layoutManager =
+            SugiyamaLayoutManager(this, SugiyamaConfiguration.Builder().build())
     }
 
     public override fun setEdgeDecoration() {
@@ -39,87 +39,61 @@ class NodesActivity : ServerMapActivity() {
         val graph = Graph()
 
         //예시로 노드, 간선 추가
+        /*
         _nodes.add(Node("user"))
         _nodes.add(Node("frontweb"))
         _nodes.add(Node("backend"))
         _nodes.add(Node("backendWeb"))
         _nodes.add(Node("mysql"))
-        _nodes.add(Node("Cloud"))
 
         graph.addEdge(_nodes.get(0), _nodes.get(1))
-        graph.addEdge(_nodes.get(1), _nodes.get(5))
         graph.addEdge(_nodes.get(1), _nodes.get(2))
         graph.addEdge(_nodes.get(1), _nodes.get(3))
         graph.addEdge(_nodes.get(2), _nodes.get(4))
-        graph.addEdge(_nodes.get(3), _nodes.get(4))
-
-        //테스트코드
-        if (postResult != null) {
-            _nodes.add(Node(postResult.toString().substring(0, 5)))
-            graph.addEdge(_nodes.get(3), _nodes.get(6))
-            Log.d(TAG, "postResult: 추가됨.")
-        } else {
-            Log.d(TAG, "postResult: null임 ")
-        }
+        graph.addEdge(_nodes.get(3), _nodes.get(4))*/
 
         //node 생성
-        if(nodeResult != null){
-            for(i in 0 until nodeResult!!.list.size){
-                _nodes.add(Node(nodeResult!!.list.get(i).name))
+        if (nodeResult != null) {
+            for (i in 0 until nodeResult!!.nodes.size) {
+                _nodes.add(Node(nodeResult!!.nodes.get(i).name))
             }
-            Log.d(TAG, "nodeResult: 추가됨.")
+            Log.d(TAG, "nodeResult: node 생성.")
         } else {
             Log.d(TAG, "nodeResult: null임 ")
         }
 
+        //graph.addEdge(_nodes.get(0), _nodes.get(1))
+
+
         //edge 생성
-        if(edgeResult != null){
-            for(i in 0 until edgeResult!!.list.size){
-                var edge1 : Int? = nodeResult?.list?.indexOfFirst { it.id ==  edgeResult!!.list.get(i).id1 }
-                var edge2 : Int? = nodeResult?.list?.indexOfFirst { it.id ==  edgeResult!!.list.get(i).id2 }
-                graph.addEdge(_nodes.get(edge1!!),_nodes.get(edge2!!))
+        if (edgeResult != null) {
+            for (i in 0 until edgeResult!!.edges.size) {
+                var edge1: Int? =
+                    nodeResult?.nodes?.indexOfFirst { it.address == edgeResult!!.edges.get(i).clientAddr }
+                Log.d(TAG, "edge1: " + edge1)
+                var edge2: Int? =
+                    nodeResult?.nodes?.indexOfFirst { it.address == edgeResult!!.edges.get(i).remoteAddr }
+                Log.d(TAG, "edge2: " + edge2)
+                if (edge1 != null) {
+                    graph.addEdge(_nodes.get(edge1), _nodes.get(edge2!!))
+                } else {
+                    Log.d(TAG, "edge1: null edge 추가 안 됨. i: " + i)
+                }
             }
-            Log.d(TAG, "edgeResult: 추가됨.")
+            Log.d(TAG, "edgeResult: edge 생성.")
         } else {
             Log.d(TAG, "edgeResult: null임 ")
         }
-
 
         return graph
     }
 
     public override fun setRetrofitInit() {
         mRetrofit = Retrofit.Builder()
-                .baseUrl("https://jsonplaceholder.typicode.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+            .baseUrl("")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
         mRetrofitAPI = mRetrofit.create(RetrofitAPI::class.java)
-    }
-
-    public override suspend fun callTestList() {
-        GlobalScope.async(Dispatchers.IO) {
-
-            val call = mRetrofitAPI.getPosts("1")
-            call.enqueue(object : Callback<PostResult?> {
-                override fun onResponse(call: Call<PostResult?>, response: Response<PostResult?>) {
-                    if (response.isSuccessful) {
-                        val result = response.body()
-                        postResult = result
-
-                        Log.d(TAG, "onResponse: 성공 + 결과 : " + result.toString().substring(0, 5))
-                        Log.d(TAG, "onResponse_postResult : " + postResult.toString().substring(0, 7))
-
-                    } else {
-                        Log.d(TAG, "onResponse: 실패")
-                    }
-                }
-
-                override fun onFailure(call: Call<PostResult?>, t: Throwable) {
-                    Log.d(TAG, "onFailure: " + t.message)
-                }
-            })
-
-        }.await()
     }
 
     public override suspend fun callNodeList() {
@@ -133,16 +107,19 @@ class NodesActivity : ServerMapActivity() {
                         val result = response.body()
                         nodeResult = result
 
-                        Log.d(TAG, "onResponse: 성공 + 결과 : " + result.toString().substring(0, 5))
-                        Log.d(TAG, "onResponse_nodeResult : " + nodeResult.toString().substring(0, 7))
+                        Log.d(TAG, "CallNodeList : 성공 + 결과 : " + result.toString().substring(0, 5))
+                        Log.d(
+                            TAG,
+                            "CallNodeList nodeResult : " + nodeResult.toString().substring(0, 7)
+                        )
 
                     } else {
-                        Log.d(TAG, "onResponse: 실패")
+                        Log.d(TAG, "CallNodeList 연결: 실패")
                     }
                 }
 
                 override fun onFailure(call: Call<NodeVO?>, t: Throwable) {
-                    Log.d(TAG, "onFailure: " + t.message)
+                    Log.d(TAG, "CallNodeList onFailure: " + t.message)
                 }
             })
 
@@ -160,16 +137,24 @@ class NodesActivity : ServerMapActivity() {
                         val result = response.body()
                         edgeResult = result
 
-                        Log.d(TAG, "onResponse: 성공 + 결과 : " + result.toString().substring(0, 5))
-                        Log.d(TAG, "onResponse_edgeResult : " + edgeResult.toString().substring(0, 7))
+                        Log.d(
+                            TAG,
+                            "CallEdgeList onResponse: 성공 + 결과 : " + result.toString()
+                                .substring(0, 5)
+                        )
+                        Log.d(
+                            TAG,
+                            "CallEdgeList onResponse_edgeResult : " + edgeResult.toString()
+                                .substring(0, 7)
+                        )
 
                     } else {
-                        Log.d(TAG, "onResponse: 실패")
+                        Log.d(TAG, "CallEdgeList onResponse: 실패")
                     }
                 }
 
                 override fun onFailure(call: Call<EdgeVO?>, t: Throwable) {
-                    Log.d(TAG, "onFailure: " + t.message)
+                    Log.d(TAG, "CallEdgeList onFailure: " + t.message)
                 }
             })
 

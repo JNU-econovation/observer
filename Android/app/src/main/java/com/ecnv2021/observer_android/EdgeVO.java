@@ -1,36 +1,37 @@
 package com.ecnv2021.observer_android;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EdgeVO {
-    private ArrayList<Edge> list;
+    private List<EdgeResponseDTO> edges;
 
-    public ArrayList<Edge> getList() {
-        return list;
+    public List<EdgeResponseDTO> getEdges() {
+        return edges;
     }
 
-    public void setList(ArrayList<Edge> list) {
-        this.list = list;
+    public void setEdges(List<EdgeResponseDTO> edges) {
+        this.edges = edges;
     }
 }
 
-class Edge {
-    private String id1;
-    private String id2;
+class EdgeResponseDTO {
+    private String clientAddr;
+    private String remoteAddr;
 
-    public String getId1() {
-        return id1;
+    public String getClientAddr() {
+        return clientAddr;
     }
 
-    public void setId1(String id1) {
-        this.id1 = id1;
+    public void setClientAddr(String clientAddr) {
+        this.clientAddr = clientAddr;
     }
 
-    public String getId2() {
-        return id2;
+    public String getRemoteAddr() {
+        return remoteAddr;
     }
 
-    public void setId2(String id2) {
-        this.id2 = id2;
+    public void setRemoteAddr(String remoteAddr) {
+        this.remoteAddr = remoteAddr;
     }
 }
