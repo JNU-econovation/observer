@@ -27,8 +27,11 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -36,17 +39,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeListener,
         OnChartValueSelectedListener {
 
-    private ScatterChart chart;
+    private static ScatterChart chart;
     private SeekBar seekBarX, seekBarY;
 
     private static Retrofit mRetrofit;
     private static RetrofitAPI mRetrofitAPI;
     private Gson mGson;
     private static StatisticsVO statisticsResult;
-    public static final String TAG = "statisticsResult";
+    public static final String TAG = "TTestStatisticsResult";
     public static TextView textView1, textView2;
 
-    public static String id;
+    public static String name;
+    TimerTask timerTask;
+    TimerTask timerTaskUI;
+    Timer timer = new Timer();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +62,7 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
         setContentView(R.layout.activity_scatterchart);
 
         Intent secondIntent = getIntent();
-        id = secondIntent.getStringExtra("id");
+        name = secondIntent.getStringExtra("name");
 
         setTitle("ScatterChart");
         textView1 = findViewById(R.id.textView1);
@@ -82,8 +89,8 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
         chart.setMaxVisibleValueCount(200);
         chart.setPinchZoom(true);
 
-        seekBarX.setProgress(500);
-        seekBarY.setProgress(200);
+        seekBarX.setProgress(1440);
+        seekBarY.setProgress(1000);
 
         Legend l = chart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -103,75 +110,108 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
         xl.setTypeface(tfLight);
         xl.setDrawGridLines(false);
 
-        //통계 데이터 UI 세팅
-        setStatisticsResult();
+        //API 서버 연결
+        setRetrofitInit();
+
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Log.d(TAG, "StatisticsData Timer starts");
+                //scatter차트 데이터 세팅
+                callStatisticsList();
+
+            }
+        };
+        timer.schedule(timerTask, 0, 5000);
+
+        timerTaskUI = new TimerTask() {
+            @Override
+            public void run() {
+                // UI Thread를 사용해서 View 를 처리합니다.
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            //통계 데이터 UI 세팅
+                            Log.d(TAG, "StatisticsUI Timer starts");
+                            setStatisticsResult();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(timerTaskUI, 1000, 5000);
+    }
+
+    @Override
+    protected void onStop() {
+        timer.cancel();
+        Log.d(TAG, "Statistics Timer onStop()");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        timer.cancel();
+        Log.d(TAG, "Statistics Timer onDestroy()");
+        super.onDestroy();
     }
 
     public void setRetrofitInit() {
         mRetrofit = new Retrofit.Builder()
-                .baseUrl("<Base URL>")
-                 .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("")
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
         mRetrofitAPI = mRetrofit.create(RetrofitAPI.class);
     }
 
     private static void callStatisticsList() {
-
-        final Call<StatisticsVO> repos = mRetrofitAPI.getStatisticsList(id);
-
-        //동기 호출
-        new AsyncTask<Void, Void, Void>() {
+        final Call<StatisticsVO> call = mRetrofitAPI.getStatisticsList(name);
+        call.enqueue(new Callback<StatisticsVO>() {
             @Override
-            protected Void doInBackground(Void... voids) {
-                try {
-                    @SuppressLint("StaticFieldLeak") Response<StatisticsVO> list = repos.execute();
-                    statisticsResult = list.body();
-                    Log.d(TAG, "onResponse: 성공 + 결과 : " + list.toString().substring(0,6));
-                    Log.d(TAG, "onResponse_xValueResult : " + statisticsResult.getSuccessList().get(0).getxValue());
-                } catch (IOException e) {
-                    Log.d(TAG, "onResponse: 실패");
+            public void onResponse(Call<StatisticsVO> call, Response<StatisticsVO> response) {
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "error code : " + response.code());
+                    return;
                 }
-                return null;
+                StatisticsVO list = response.body();
+                statisticsResult = list;
+                Log.d(TAG, "StatisticsResult: 성공 + 결과 : " + list.toString().substring(0, 6));
+                Log.d(TAG, "StatisticsResult_xValueResult : " + statisticsResult.getSuccessList().get(0).getTransactionStartTime());
             }
 
-            @SuppressLint("StaticFieldLeak")
             @Override
-            protected void onPostExecute(Void aVoid) {
-                ArrayList<Entry> values1 = new ArrayList<>();
-                ArrayList<Entry> values2 = new ArrayList<>();
-                super.onPostExecute(aVoid);
-                for (int i = 0; i < statisticsResult.getSuccessList().size(); i++) {
-                    float x = statisticsResult.getSuccessList().get(i).getxValue();
-                    float y = statisticsResult.getSuccessList().get(i).getyValue();
-                    values1.add(new Entry(x,y));
-                }
-
-                for (int i = 0; i < statisticsResult.getFailList().size(); i++) {
-                    float x = statisticsResult.getFailList().get(i).getxValue();
-                    float y = statisticsResult.getFailList().get(i).getyValue();
-                    values1.add(new Entry(x,y));
-                }
-
-                textView1.setText("Success: "+statisticsResult.getSuccessNum());
-                textView2.setText("Success: "+statisticsResult.getFailNum());
+            public void onFailure(Call<StatisticsVO> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
+                Log.d(TAG, "Statistics onResponse: 실패");
             }
-        }.execute();
+        });
     }
 
-    public void setStatisticsResult(){
+    public void setStatisticsResult() {
         ArrayList<Entry> values1 = new ArrayList<>();
         ArrayList<Entry> values2 = new ArrayList<>();
 
-        for (int i = 0; i < seekBarX.getProgress(); i++) {
-            float val = (float) (Math.random() * seekBarY.getProgress()) + 3;
-            values1.add(new Entry(i, val));
-        }
+        if (statisticsResult != null) {
+            Log.d(TAG, "Statistics data values 추가");
+            for (int i = 0; i < statisticsResult.getSuccessList().size(); i++) {
+                float x = (float) statisticsResult.getSuccessList().get(i).getTransactionStartTime();
+                float y = (float) statisticsResult.getSuccessList().get(i).getTransactionTimeMillis();
+                values1.add(new Entry(x, y));
+            }
 
-        for (int i = 0; i < seekBarX.getProgress(); i++) {
-            float val = (float) (Math.random() * seekBarY.getProgress()) + 3;
-            values2.add(new Entry(i+0.33f, val));
+            for (int i = 0; i < statisticsResult.getFailList().size(); i++) {
+                float x = (float) statisticsResult.getFailList().get(i).getTransactionStartTime();
+                float y = (float) statisticsResult.getFailList().get(i).getTransactionTimeMillis();
+                values1.add(new Entry(x, y));
+            }
+            textView1.setText("Success: " + statisticsResult.getSuccessNum());
+            textView2.setText("Fail: " + statisticsResult.getFailNum());
+        } else {
+            Log.d(TAG, "StatisticsResult 값 null");
         }
-
 
         // create a dataset and give it a type
         ScatterDataSet set1 = new ScatterDataSet(values1, "Success");
@@ -218,11 +258,14 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
     }
 
     @Override
-    public void onNothingSelected() {}
+    public void onNothingSelected() {
+    }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {}
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {}
+    public void onStopTrackingTouch(SeekBar seekBar) {
+    }
 }

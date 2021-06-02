@@ -30,46 +30,59 @@ abstract class ServerMapActivity : AppCompatActivity() {
     protected abstract fun createGraph(): Graph
     protected abstract fun setLayoutManager()
     protected abstract fun setEdgeDecoration()
-    protected abstract suspend fun callTestList()
     protected abstract fun setRetrofitInit()
     protected abstract suspend fun callNodeList()
     protected abstract suspend fun callEdgeList()
+    private var timerTask: Timer? = null
+    private val TAG = "TTestServerMap"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_graph)
+    }
 
+    override fun onResume() {
         var graph: Graph? = null
 
         //api 서버 연결 init
         setRetrofitInit()
 
-        //Test PostResult 받아오기
-        runBlocking {
-            GlobalScope.launch {
-                callTestList()
+        timerTask = kotlin.concurrent.timer(period = 5000) {
+            //서버에서 Node, Edge정보 가져오기
+
+            runBlocking {
+             Log.d(TAG, "ServerMapData timer starts")
+                GlobalScope.launch {
+                    callNodeList()
+                    callEdgeList()
+                }
+            }
+
+            runOnUiThread {
+                //서버맵 UI 세팅
+                Log.d(TAG, "ServerMapUI timer starts")
+                Handler().postDelayed({
+                    graph = createGraph()
+                    recyclerView = findViewById(R.id.recycler)
+                    setLayoutManager()
+                    setEdgeDecoration()
+                    setupGraphView(graph)
+                }, 1000L)
             }
         }
+        super.onResume()
+    }
 
-        //서버에서 Node, Edge정보 가져오기
-        /*
-        runBlocking {
-            GlobalScope.launch {
-                callNodeList()
-                callEdgeList()
-            }
-        }*/
+    override fun onPause() {
+        Log.i(TAG, "ServerMap onPause()");
+        timerTask?.cancel();
+        super.onPause()
+    }
 
-        //서버맵 UI 세팅
-        Handler().postDelayed({
-            graph = createGraph()
-
-            recyclerView = findViewById(R.id.recycler)
-            setLayoutManager()
-            setEdgeDecoration()
-            setupGraphView(graph)
-        }, 1000L)
-
+    override fun onDestroy() {
+        Log.i(TAG, "ServerMap onDestroy()");
+        timerTask?.cancel();
+        super.onDestroy()
     }
 
     private fun setupGraphView(graph: Graph?) {
@@ -101,9 +114,10 @@ abstract class ServerMapActivity : AppCompatActivity() {
         init {
             itemView.setOnClickListener {
                 val nextIntent = Intent(this@ServerMapActivity, ScatterChartActivity::class.java)
-                nextIntent.putExtra("id", "1")
-                startActivity(nextIntent)
                 currentNode = adapter.getNode(bindingAdapterPosition)
+                Log.d(TAG, adapter.getNodeData(bindingAdapterPosition)?.toString()!!)
+                nextIntent.putExtra("name", adapter.getNodeData(bindingAdapterPosition)?.toString())
+                startActivity(nextIntent)
             }
         }
     }

@@ -3,10 +3,11 @@ package com.ecnv2021.observer_android;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NodeVO {
     private int size;
-    private ArrayList<Node> list;
+    private List<NodeResponseDTO> nodes;
 
     public int getSize() {
         return size;
@@ -16,30 +17,30 @@ public class NodeVO {
         this.size = size;
     }
 
-    public ArrayList<Node> getList() {
-        return list;
+    public List<NodeResponseDTO> getNodes() {
+        return nodes;
     }
 
-    public void setList(ArrayList<Node> list) {
-        this.list = list;
+    public void setNodes(List<NodeResponseDTO> nodes) {
+        this.nodes = nodes;
     }
 }
 
-class Node {
-    private String id;
+class NodeResponseDTO {
+    private String address;
     private String name;
 
-    public Node(String id, String name) {
-        this.id = id;
+    public NodeResponseDTO(String address, String name) {
+        this.address = address;
         this.name = name;
     }
 
-    public String getId() {
-        return id;
+    public String getAddress() {
+        return address;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAddress(String id) {
+        this.address = id;
     }
 
     public String getName() {
