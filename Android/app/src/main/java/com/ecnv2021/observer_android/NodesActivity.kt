@@ -76,11 +76,11 @@ class NodesActivity : ServerMapActivity() {
 
                 if (edge1 != null && edge1 != -1) {
                     graph.addEdge(_nodes.get(edge1), _nodes.get(edge2!!))
-                    Log.d(TAG, "edgeResult: edge 생성. "+i)
-                }else if(edge1 == -1 && edge2 != 0){
+                    Log.d(TAG, "edgeResult: edge 생성. " + i)
+                } else if (edge1 == -1 && edge2 != 0) {
                     graph.addEdge(_nodes.get(0), _nodes.get(edge2!!))
-                    Log.d(TAG, "edgeResult: edge -1 생성. "+i)
-                }else {
+                    Log.d(TAG, "edgeResult: edge -1 생성. " + i)
+                } else {
                     Log.d(TAG, "edge1: null edge 추가 안 됨. i: " + i)
                 }
             }

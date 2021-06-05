@@ -51,7 +51,7 @@ abstract class ServerMapActivity : AppCompatActivity() {
             //서버에서 Node, Edge정보 가져오기
 
             runBlocking {
-             Log.d(TAG, "ServerMapData timer starts")
+                Log.d(TAG, "ServerMapData timer starts")
                 GlobalScope.launch {
                     callNodeList()
                     callEdgeList()
@@ -89,7 +89,7 @@ abstract class ServerMapActivity : AppCompatActivity() {
         adapter = object : AbstractGraphAdapter<NodeViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeViewHolder {
                 val view = LayoutInflater.from(parent.context)
-                        .inflate(R.layout.node, parent, false)
+                    .inflate(R.layout.node, parent, false)
                 return NodeViewHolder(view)
             }
 
@@ -108,7 +108,8 @@ abstract class ServerMapActivity : AppCompatActivity() {
         return true
     }
 
-    protected inner class NodeViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    protected inner class NodeViewHolder internal constructor(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
         var textView: TextView = itemView.findViewById(R.id.textView)
 
         init {
