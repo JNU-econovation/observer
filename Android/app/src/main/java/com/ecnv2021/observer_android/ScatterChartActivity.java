@@ -64,7 +64,7 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
         Intent secondIntent = getIntent();
         name = secondIntent.getStringExtra("name");
 
-        setTitle("ScatterChart");
+        setTitle(name);
         textView1 = findViewById(R.id.textView1);
         textView2 = findViewById(R.id.textView2);
 
@@ -122,7 +122,7 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
 
             }
         };
-        timer.schedule(timerTask, 0, 5000);
+        timer.schedule(timerTask, 0, 2000);
 
         timerTaskUI = new TimerTask() {
             @Override
@@ -142,7 +142,7 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
                 });
             }
         };
-        timer.schedule(timerTaskUI, 1000, 5000);
+        timer.schedule(timerTaskUI, 1000, 2000);
     }
 
     @Override
@@ -205,7 +205,7 @@ public class ScatterChartActivity extends DemoBase implements OnSeekBarChangeLis
             for (int i = 0; i < statisticsResult.getFailList().size(); i++) {
                 float x = (float) statisticsResult.getFailList().get(i).getTransactionStartTime();
                 float y = (float) statisticsResult.getFailList().get(i).getTransactionTimeMillis();
-                values1.add(new Entry(x, y));
+                values2.add(new Entry(x, y));
             }
             textView1.setText("Success: " + statisticsResult.getSuccessNum());
             textView2.setText("Fail: " + statisticsResult.getFailNum());

@@ -47,7 +47,7 @@ abstract class ServerMapActivity : AppCompatActivity() {
         //api 서버 연결 init
         setRetrofitInit()
 
-        timerTask = kotlin.concurrent.timer(period = 5000) {
+        timerTask = kotlin.concurrent.timer(period = 4000) {
             //서버에서 Node, Edge정보 가져오기
 
             runBlocking {

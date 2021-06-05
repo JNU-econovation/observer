@@ -38,7 +38,7 @@ class NodesActivity : ServerMapActivity() {
     public override fun createGraph(): Graph {
         val graph = Graph()
 
-        //예시로 노드, 간선 추가
+        //예시 노드, 간선 추가
         /*
         _nodes.add(Node("user"))
         _nodes.add(Node("frontweb"))
@@ -61,9 +61,8 @@ class NodesActivity : ServerMapActivity() {
         } else {
             Log.d(TAG, "nodeResult: null임 ")
         }
-
+        //_nodes.add(Node("mysql"))
         //graph.addEdge(_nodes.get(0), _nodes.get(1))
-
 
         //edge 생성
         if (edgeResult != null) {
@@ -74,13 +73,17 @@ class NodesActivity : ServerMapActivity() {
                 var edge2: Int? =
                     nodeResult?.nodes?.indexOfFirst { it.address == edgeResult!!.edges.get(i).remoteAddr }
                 Log.d(TAG, "edge2: " + edge2)
-                if (edge1 != null) {
+
+                if (edge1 != null && edge1 != -1) {
                     graph.addEdge(_nodes.get(edge1), _nodes.get(edge2!!))
-                } else {
+                    Log.d(TAG, "edgeResult: edge 생성. "+i)
+                }else if(edge1 == -1 && edge2 != 0){
+                    graph.addEdge(_nodes.get(0), _nodes.get(edge2!!))
+                    Log.d(TAG, "edgeResult: edge -1 생성. "+i)
+                }else {
                     Log.d(TAG, "edge1: null edge 추가 안 됨. i: " + i)
                 }
             }
-            Log.d(TAG, "edgeResult: edge 생성.")
         } else {
             Log.d(TAG, "edgeResult: null임 ")
         }
